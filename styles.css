@@ -1109,26 +1109,25 @@ a { color: inherit; text-decoration: none; }
   line-height: 1.6;
 }
 .legend-item {
-  display: inline-table;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   margin: 0 10px;
   vertical-align: middle;
   white-space: nowrap;
 }
-.legend-cell-dot,
-.legend-cell-text {
-  display: table-cell;
-  vertical-align: middle;
-}
-.legend-cell-dot {
-  padding-right: 7px;
-}
-.legend-dot {
-  display: block;
+.legend-svg {
+  display: inline-block;
   width: 11px;
   height: 11px;
+  flex-shrink: 0;
 }
-.legend-svg {
-  display: block;
+.legend-cell-text {
+  display: inline-flex;
+  align-items: center;
+}
+.artifact.is-exporting .legend-cell-text {
+  transform: translateY(-7px);
 }
 .legend-note {
   margin-top: 6px;
