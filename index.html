@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shared Responsibility Matrix Generator · Blacksmith InfoSec</title>
+  <meta name="description" content="Generate a one-page shared responsibility matrix showing how security responsibilities split between Cloud Provider, MSP, and Customer.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/svg+xml" href="assets/blacksmith-bright-blue.svg">
+</head>
+<body>
+
+<nav class="nav">
+  <a class="brand" href="https://blacksmithinfosec.com" target="_blank" rel="noopener">
+    <svg class="brand-mark" viewBox="0 0 1010.16 1200" fill="currentColor" aria-hidden="true">
+      <polygon points="844.27 0 166.99 0 22.57 373.1 0 989.36 394.3 1200 394.3 682.2 490.31 593.02 166.99 593.02 166.99 373.1 414.67 373.1 414.67 318.12 596.3 318.12 596.3 373.1 733.21 373.1 868.61 591.66 616.41 593.02 616.41 1200 1010.16 989.5 987.88 373.1 844.27 0"/>
+    </svg>
+    <span class="brand-text">
+      <span class="brand-name">Blacksmith<span class="brand-dot">.</span></span>
+      <span class="brand-sub">Shared Responsibility Matrix</span>
+    </span>
+  </a>
+  <div class="nav-right">
+    <nav class="header-nav" aria-label="External links">
+      <a href="https://github.com/blacksmithinfosec/shared-responsibility-matrix" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://blacksmithinfosec.com" target="_blank" rel="noopener">Blacksmith</a>
+    </nav>
+    <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle theme">
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="4"></circle>
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+      </svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+    </button>
+  </div>
+</nav>
+
+<div class="main">
+
+  <aside class="form-panel">
+
+    <header class="hero">
+      <h1 class="hero-title">Who owns what for <span class="hero-accent">this</span> client<span class="brand-dot">.</span></h1>
+    </header>
+
+    <section class="form-section">
+      <h2 class="section-legend">
+        <span class="section-title">Customer details</span>
+      </h2>
+      <div class="form-field">
+        <label for="customer">Client name <span class="field-hint">(optional)</span></label>
+        <input type="text" id="customer" class="input-underline" placeholder="Client or organization name" autocomplete="off">
+      </div>
+      <div class="form-field">
+        <label for="msp">Prepared by <span class="field-hint">(optional)</span></label>
+        <input type="text" id="msp" class="input-underline" placeholder="Your firm or MSP name" autocomplete="off">
+      </div>
+      <div class="form-field">
+        <label>MSP logo <span class="field-hint">optional · stored in your browser</span></label>
+        <div class="logo-upload" id="logo-upload">
+          <div class="logo-upload-preview" id="logo-upload-preview"></div>
+          <div class="logo-upload-controls">
+            <button type="button" class="btn-thin" id="logo-upload-btn">Choose file…</button>
+            <button type="button" class="text-link" id="logo-clear-btn" hidden>remove</button>
+          </div>
+          <input type="file" id="logo-file-input" accept="image/png,image/jpeg,image/svg+xml,image/webp" hidden>
+        </div>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <h2 class="section-legend">
+        <span class="section-title">Systems in scope</span>
+        <span class="form-section-count" id="system-count"></span>
+      </h2>
+      <p class="section-help">Add the business systems you're mapping. Start with a template for sensible defaults, or pick Custom for a blank row.</p>
+
+      <div class="add-system-wrap">
+        <button class="btn-add-system" id="add-system-btn" type="button">
+          <span>+ Add system</span>
+          <span class="chev">▼</span>
+        </button>
+        <div class="add-menu" id="add-menu" hidden></div>
+      </div>
+
+      <div class="system-list" id="system-list"></div>
+    </section>
+
+    <div class="form-actions">
+      <button class="btn-thin" id="reset-all" type="button" hidden>↺ Reset everything</button>
+    </div>
+
+  </aside>
+
+  <main class="output-panel">
+
+    <div class="output-toolbar">
+      <div class="output-toolbar-title">Preview</div>
+      <div class="output-toolbar-actions">
+        <button class="btn btn-secondary" id="download-png" type="button">PNG</button>
+        <button class="btn" id="download-pdf" type="button">PDF</button>
+      </div>
+    </div>
+
+    <p class="output-disclaimer">This is a planning aid. Confirm specific responsibility splits in your managed services agreement before treating them as binding.</p>
+
+    <div class="artifact-wrap">
+      <div class="artifact" id="artifact">
+
+        <div class="artifact-head">
+          <div>
+            <h1 class="artifact-title">Shared responsibility matrix</h1>
+            <div class="artifact-sub">
+              <span id="artifact-customer">Customer name</span>
+              &nbsp;·&nbsp; Managed by
+              <span id="artifact-msp">MSP name</span>
+              &nbsp;·&nbsp;
+              <span id="artifact-date">May 2026</span>
+            </div>
+          </div>
+          <div class="artifact-logo" id="artifact-msp-logo">
+            <span class="artifact-logo-placeholder">MSP<br>LOGO</span>
+          </div>
+        </div>
+
+        <div id="artifact-body">
+          <div class="matrix" id="matrix"></div>
+        </div>
+
+        <div class="legend">
+          <span class="legend-item"><span class="legend-swatch" style="background: #D97706"></span>Vendor / platform provider</span>
+          <span class="legend-item"><span class="legend-swatch" style="background: #44C8F5"></span>MSP</span>
+          <span class="legend-item"><span class="legend-swatch" style="background: #16A34A"></span>Client</span>
+          <span class="legend-item"><span class="legend-swatch legend-swatch-empty"></span>Not involved</span>
+        </div>
+
+        <div class="artifact-foot">
+          <svg class="artifact-foot-mark" viewBox="0 0 1010.16 1200" fill="currentColor" aria-hidden="true">
+            <polygon points="844.27 0 166.99 0 22.57 373.1 0 989.36 394.3 1200 394.3 682.2 490.31 593.02 166.99 593.02 166.99 373.1 414.67 373.1 414.67 318.12 596.3 318.12 596.3 373.1 733.21 373.1 868.61 591.66 616.41 593.02 616.41 1200 1010.16 989.5 987.88 373.1 844.27 0"/>
+          </svg>
+          <span class="artifact-foot-text">Generated by Blacksmith InfoSec · blacksmithinfosec.com</span>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="data/categories.js"></script>
+<script src="data/systems.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>
