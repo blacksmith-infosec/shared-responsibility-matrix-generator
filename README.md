@@ -16,6 +16,7 @@ You input:
 You get back:
 
 - A clean one-page matrix showing who handles what across seven security categories
+- Your MSP logo on every matrix (uploaded once, stored in your browser)
 - Downloadable as PNG (for LinkedIn) or PDF (for client deliverables)
 - Auto-saved to the URL so you can bookmark and return later, or send the URL to a colleague to continue editing
 
@@ -26,8 +27,8 @@ The matrix uses binary involvement indicators (one dot per party, on or off) rat
 This is a static site. No build step, no dependencies to install.
 
 ```bash
-git clone https://github.com/blacksmithinfosec/shared-responsibility-matrix.git
-cd shared-responsibility-matrix
+git clone https://github.com/blacksmith-infosec/shared-responsibility-matrix-generator.git
+cd shared-responsibility-matrix-generator
 python3 -m http.server 8000
 ```
 
@@ -54,24 +55,27 @@ The defaults in `systems.js` are an opinionated starting point drawn from public
 
 ## Roadmap
 
-v0 (this version):
+v0 (this release):
 
-- Static system catalog
-- Live preview as you type
-- PNG export
+- Nine system templates with default responsibility assignments (Microsoft 365, Entra ID, Azure, AWS, Google Workspace, endpoints, network gear, backup, generic SaaS)
+- Custom systems for anything not in the catalog
+- Per-cell V/M/C overrides on every system in your matrix
+- Real-time preview as you build
+- PNG export (LinkedIn-ready) and PDF export (landscape letter, client-ready)
+- MSP logo upload, stored in your browser
+- Light and dark themes
+- URL-hash auto-save so you can bookmark or share a matrix with a colleague to continue editing
 
 v0.x:
 
-- PDF export
-- MSP logo upload
-- Per-cell responsibility override
-- Save and reload engagements (local storage)
-- More systems in the catalog
+- CSV import and export for bulk operations
+- Copy-share-link button (right now URL save is silent)
+- Refined template defaults using an active operational responsibility lens
+- Additional system types in the catalog
 
 v1:
 
-- Per-system responsibility overrides at engagement level
-- Framework annotations (CMMC, HIPAA, NIST 800-171 references on rows)
+- Framework annotations on rows (CMMC, HIPAA, NIST 800-171 references)
 - Multiple matrix layouts (this one, plus a per-system card layout)
 
 ## License
