@@ -509,7 +509,15 @@
           <svg class="artifact-empty-mark" viewBox="0 0 1010.16 1200" fill="currentColor" aria-hidden="true">
             <polygon points="844.27 0 166.99 0 22.57 373.1 0 989.36 394.3 1200 394.3 682.2 490.31 593.02 166.99 593.02 166.99 373.1 414.67 373.1 414.67 318.12 596.3 318.12 596.3 373.1 733.21 373.1 868.61 591.66 616.41 593.02 616.41 1200 1010.16 989.5 987.88 373.1 844.27 0"/>
           </svg>
-          <p class="artifact-empty-copy">Add a system on the left to start building the responsibility matrix. Each system you add becomes a row mapped across the seven security control categories.</p>
+          <h3 class="artifact-empty-title">Start with a template</h3>
+          <p class="artifact-empty-copy">Each system you add becomes a row in the matrix, showing who handles each security area. Pick one below or use Add system for the full catalog.</p>
+          <p class="artifact-workflow">1 &middot; Add systems &nbsp; &nbsp; 2 &middot; Set V/M/C &nbsp; &nbsp; 3 &middot; Export PNG or PDF</p>
+          <div class="artifact-quickstart">
+            <button class="artifact-quickstart-btn" data-tpl="m365" type="button">Microsoft 365</button>
+            <button class="artifact-quickstart-btn" data-tpl="endpoints" type="button">Endpoints</button>
+            <button class="artifact-quickstart-btn" data-tpl="network" type="button">Network</button>
+            <button class="artifact-quickstart-btn" data-tpl="backup" type="button">Backup</button>
+          </div>
         </div>
       `;
       return;
@@ -565,6 +573,7 @@
     const originalText = btn.textContent;
     btn.disabled = true;
     btn.textContent = '...';
+    node.classList.add('is-exporting');
 
     html2canvas(node, { backgroundColor: '#FFFFFF', scale: 2, logging: false, useCORS: true, allowTaint: true })
       .then(canvas => {
@@ -577,6 +586,7 @@
       .finally(() => {
         btn.disabled = false;
         btn.textContent = originalText;
+        node.classList.remove('is-exporting');
       });
   }
 
@@ -595,6 +605,7 @@
     const originalText = btn.textContent;
     btn.disabled = true;
     btn.textContent = '...';
+    node.classList.add('is-exporting');
 
     html2canvas(node, { backgroundColor: '#FFFFFF', scale: 2, logging: false, useCORS: true, allowTaint: true })
       .then(canvas => {
@@ -625,6 +636,7 @@
       .finally(() => {
         btn.disabled = false;
         btn.textContent = originalText;
+        node.classList.remove('is-exporting');
       });
   }
 
@@ -633,6 +645,55 @@
       .replace(/[^a-z0-9]+/gi, '-')
       .replace(/^-+|-+$/g, '')
       .toLowerCase() || 'matrix';
+  }
+
+  // ---------- CSV export ----------
+  // Round-trippable format. Header row is [System, Vendor] followed by the
+  // seven category columns. Cells contain V/M/C codes (always in V, M, C
+  // order regardless of source ordering) or are empty when the category
+  // doesn't apply to that system.
+  function downloadCSV() {
+    if (state.systems.length === 0) {
+      alert('Add at least one system before exporting.');
+      return;
+    }
+
+    const cats = window.SRM_DATA.categories;
+
+    const csvEscape = (val) => {
+      const s = String(val == null ? '' : val);
+      if (/[",\n\r]/.test(s)) {
+        return '"' + s.replace(/"/g, '""') + '"';
+      }
+      return s;
+    };
+
+    const headers = ['System', 'Vendor'].concat(
+      cats.map(c => `${c.main} ${c.sub}`.trim())
+    );
+    const rows = [headers];
+
+    state.systems.forEach(sys => {
+      const row = [sys.name || '', sys.vendor || ''];
+      cats.forEach(cat => {
+        const codes = sys.assignments[cat.id] || [];
+        let cell = '';
+        if (codes.includes('v')) cell += 'V';
+        if (codes.includes('m')) cell += 'M';
+        if (codes.includes('c')) cell += 'C';
+        row.push(cell);
+      });
+      rows.push(row);
+    });
+
+    const csv = rows.map(r => r.map(csvEscape).join(',')).join('\r\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `srm-${makeSlug()}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
   }
 
   // ---------- Reset ----------
@@ -700,6 +761,18 @@
 
     $('#download-png').addEventListener('click', downloadPNG);
     $('#download-pdf').addEventListener('click', downloadPDF);
+    $('#download-csv').addEventListener('click', downloadCSV);
     $('#reset-all').addEventListener('click', resetAll);
+
+    // Quickstart template buttons in the artifact empty state. Delegated
+    // because the empty state is re-rendered whenever the system list
+    // empties out, so a direct listener on the buttons would go stale.
+    document.body.addEventListener('click', e => {
+      const btn = e.target.closest('.artifact-quickstart-btn');
+      if (!btn) return;
+      const tplId = btn.dataset.tpl;
+      const template = window.SRM_DATA.systems.find(s => s.id === tplId);
+      if (template) addSystem(template);
+    });
   });
 })();
