@@ -1140,7 +1140,7 @@ a { color: inherit; text-decoration: none; }
 
 /* Hide the empty logo placeholder on export so the deliverable
    doesn't show "+ MSP LOGO" text when no logo was uploaded. The
-   .is-exporting class is toggled in app.js around html2canvas. */
+   .is-exporting class is toggled during image capture. */
 .artifact.is-exporting .artifact-logo:not(.has-logo) {
   display: none;
 }

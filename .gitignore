@@ -9,19 +9,22 @@
 .DS_Store
 Thumbs.db
 
-# Node (if added later)
+# Dependencies
 node_modules/
-package-lock.json
-yarn.lock
 npm-debug.log*
 yarn-debug.log*
 
-# Build output (if added later)
+# Generated outputs
 dist/
 build/
+coverage/
+playwright-report/
+test-results/
+.env
+.env.*
+!.env.example
 
-# Local artifact outputs (people might download PNGs into the project folder)
-*.png
-*.pdf
-!assets/*.png
-!assets/*.pdf
+# Exported matrices
+/srm-*.png
+/srm-*.pdf
+/srm-*.csv

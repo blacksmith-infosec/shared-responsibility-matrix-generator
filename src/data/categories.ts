@@ -1,10 +1,6 @@
-// data/categories.js
-// The seven responsibility categories shown as columns in the matrix.
-// Each has a two-line label: a main word and a subtitle.
+import type { Category } from '../types/matrix';
 
-window.SRM_DATA = window.SRM_DATA || {};
-
-window.SRM_DATA.categories = [
+export const CATEGORIES: Category[] = [
   { id: 'data',     main: 'Data',         sub: 'classification' },
   { id: 'identity', main: 'Identity',     sub: 'access' },
   { id: 'endpoint', main: 'Endpoint',     sub: 'protection' },

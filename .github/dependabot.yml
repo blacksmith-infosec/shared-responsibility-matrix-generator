@@ -1,0 +1,29 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    reviewers:
+      - jcasner
+    groups:
+      react:
+        patterns:
+          - '*react*'
+          - '@react*'
+      vite:
+        patterns:
+          - 'vite*'
+          - '@vite*'
+          - 'vitest*'
+          - '@vitest*'
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    reviewers:
+      - jcasner
+    groups:
+      github-actions-dependencies:
+        patterns:
+          - '*'
