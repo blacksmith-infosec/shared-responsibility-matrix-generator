@@ -1,8 +1,9 @@
 import { createRef } from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { SYSTEM_TEMPLATES } from '../../data/systems';
+import { createSystem } from '../../modules/matrix';
 import type { MatrixSystem } from '../../types/matrix';
 import { MatrixPreview } from './index';
 
@@ -12,6 +13,39 @@ const defaultProps = {
 };
 
 describe('MatrixPreview', () => {
+  it('exposes systems, categories, and assigned parties as an accessible table', () => {
+    const system = createSystem(1);
+    system.name = 'Client infrastructure';
+    system.vendor = 'Example vendor';
+    system.assignments = {
+      data: ['v'], identity: ['m'], endpoint: ['c'], network: ['c', 'v'],
+      app: ['c', 'v', 'm'], backup: [], logging: ['m', 'v'],
+    };
+    render(<MatrixPreview {...defaultProps} systems={[system, { ...createSystem(2), name: 'Email' }]} />);
+
+    const preview = screen.getByRole('region', { name: 'Responsibility matrix preview' });
+    expect(preview).toHaveAttribute('tabindex', '0');
+    const table = within(preview).getByRole('table', { name: 'Shared responsibility matrix' });
+    const rows = within(table).getAllByRole('row');
+    expect(rows).toHaveLength(3);
+    const columns = within(rows[0]).getAllByRole('columnheader');
+    expect(columns).toHaveLength(8);
+    expect(columns[0]).toHaveAccessibleName('System');
+    expect(columns[1]).toHaveAccessibleName('Data classification');
+    columns.forEach((column) => expect(column).toHaveAttribute('scope', 'col'));
+
+    const firstSystem = within(rows[1]);
+    const rowHeader = firstSystem.getByRole('rowheader');
+    expect(rowHeader).toHaveAttribute('scope', 'row');
+    expect(rowHeader).toHaveAccessibleName('Client infrastructure Example vendor');
+    const cells = firstSystem.getAllByRole('cell');
+    const partyLabels = ['Vendor', 'MSP', 'Client', 'Vendor, Client', 'Vendor, MSP, Client', 'Unassigned', 'Vendor, MSP'];
+    expect(cells).toHaveLength(partyLabels.length);
+    cells.forEach((cell, index) => expect(cell).toHaveAccessibleName(partyLabels[index]));
+    expect(within(rows[2]).getByRole('rowheader')).toHaveAccessibleName('Email');
+    within(rows[2]).getAllByRole('cell').forEach((cell) => expect(cell).toHaveAccessibleName('Unassigned'));
+  });
+
   it('keeps the empty preview, quickstart templates, and metadata', async () => {
     const user = userEvent.setup();
     const onAdd = vi.fn();
@@ -42,7 +76,6 @@ describe('MatrixPreview', () => {
     expect(screen.queryByText('Start with a template')).not.toBeInTheDocument();
     expect(screen.getByText('Acme')).toBeInTheDocument();
     expect(screen.getByText('Example MSP')).toBeInTheDocument();
-    expect(container.querySelector('#matrix')).toHaveStyle({ gridTemplateColumns: '160px repeat(7, 1fr)' });
     expect(container.querySelectorAll('.m-hcell')).toHaveLength(8);
     expect(container.querySelectorAll('.m-cell')).toHaveLength(7);
     const dataDots = container.querySelectorAll('.m-cell')[0].querySelectorAll('.dot');

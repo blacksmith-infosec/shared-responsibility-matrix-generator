@@ -17,7 +17,7 @@ const MatrixEditor = () => {
   const [pendingExport, setPendingExport] = useState<ImageFormat | null>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
   const artifactRef = useRef<HTMLDivElement>(null);
-  const hasMatrixData = Boolean(state.customer || state.msp || state.systems.length);
+  const hasResettableData = Boolean(state.customer || state.msp || state.systems.length || logoDataUrl);
 
   const handleAddSystem = (template?: SystemTemplate) => dispatch({ type: 'add', template });
   const handleRemoveSystem = (id: string) => dispatch({ type: 'remove', id });
@@ -62,6 +62,7 @@ const MatrixEditor = () => {
   const handleReset = () => {
     if (!window.confirm('Clear all systems and branding, and reset the URL? This cannot be undone.')) return;
     dispatch({ type: 'reset' });
+    handleLogoChange(null);
     saveHash(createEmptyState());
   };
 
@@ -93,7 +94,7 @@ const MatrixEditor = () => {
         <SystemList systems={state.systems} onAdd={handleAddSystem} onRemove={handleRemoveSystem}
           onChange={handleSystemChange} onToggleExpanded={handleToggleExpanded} onToggleParty={handleToggleParty} />
         <div className="form-actions">
-          <button className="btn-thin" id="reset-all" type="button" hidden={!hasMatrixData} onClick={handleReset}>
+          <button className="btn-thin" id="reset-all" type="button" hidden={!hasResettableData} onClick={handleReset}>
             ↺ Reset everything
           </button>
         </div>

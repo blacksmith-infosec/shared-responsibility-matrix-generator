@@ -1,4 +1,3 @@
-import { Fragment } from 'react';
 import type { KeyboardEvent, RefObject } from 'react';
 import { CATEGORIES } from '../../data/categories';
 import { SYSTEM_TEMPLATES } from '../../data/systems';
@@ -21,14 +20,19 @@ const QUICKSTART_TEMPLATES = SYSTEM_TEMPLATES.filter((template) => QUICKSTART_ID
 const VENDOR_NOTE = 'Vendor platform security and any contracted managed security services. '
   + 'Tenant configuration, user access, data governance, and security settings remain with the client or MSP '
   + 'unless explicitly delegated.';
+const PARTY_LABELS: Record<Party, string> = { v: 'Vendor', m: 'MSP', c: 'Client' };
 
-const MatrixCell = ({ parties }: { parties: Party[] }) => (
-  <div className="m-cell">
-    {parties.length === 0 ? <span className="na">—</span> : PARTIES.map((party) => (
-      <span key={party} className={`dot ${party} ${parties.includes(party) ? 'on' : 'off'}`} />
-    ))}
-  </div>
-);
+const MatrixCell = ({ parties }: { parties: Party[] }) => {
+  const selectedParties = PARTIES.filter((party) => parties.includes(party));
+  const label = selectedParties.map((party) => PARTY_LABELS[party]).join(', ') || 'Unassigned';
+  return (
+    <td className="m-cell" aria-label={label}>
+      {parties.length === 0 ? <span className="na" aria-hidden="true">—</span> : PARTIES.map((party) => (
+        <span key={party} className={`dot ${party} ${parties.includes(party) ? 'on' : 'off'}`} aria-hidden="true" />
+      ))}
+    </td>
+  );
+};
 
 export const MatrixPreview = ({
   customer, msp, systems, logoDataUrl, onChooseLogo, onAdd, artifactRef,
@@ -89,24 +93,33 @@ export const MatrixPreview = ({
               </div>
             </div>
           ) : (
-            <div className="matrix" id="matrix" style={{ gridTemplateColumns: `160px repeat(${CATEGORIES.length}, 1fr)` }}>
-              <div className="m-hcell" />
-              {CATEGORIES.map((category) => (
-                <div className="m-hcell" key={category.id}>
-                  {category.main}<span className="m-hsub">{category.sub}</span>
-                </div>
-              ))}
-              {systems.map((system) => (
-                <Fragment key={system.id}>
-                  <div className="m-rlabel">
-                    {system.name || 'Untitled system'}
-                    {system.vendor && <span className="m-rsub">{system.vendor}</span>}
-                  </div>
-                  {CATEGORIES.map((category) => (
-                    <MatrixCell key={category.id} parties={system.assignments[category.id]} />
+            // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- Keyboard users must be able to scroll the table.
+            <div className="matrix-scroll" role="region" aria-label="Responsibility matrix preview" tabIndex={0}>
+              <table className="matrix" id="matrix" aria-label="Shared responsibility matrix">
+                <thead>
+                  <tr>
+                    <th className="m-hcell" scope="col">System</th>
+                    {CATEGORIES.map((category) => (
+                      <th className="m-hcell" scope="col" key={category.id}>
+                        {category.main}{' '}<span className="m-hsub">{category.sub}</span>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {systems.map((system) => (
+                    <tr key={system.id}>
+                      <th className="m-rlabel" scope="row">
+                        {system.name || 'Untitled system'}
+                        {system.vendor && <> <span className="m-rsub">{system.vendor}</span></>}
+                      </th>
+                      {CATEGORIES.map((category) => (
+                        <MatrixCell key={category.id} parties={system.assignments[category.id]} />
+                      ))}
+                    </tr>
                   ))}
-                </Fragment>
-              ))}
+                </tbody>
+              </table>
             </div>
           )}
         </div>

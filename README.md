@@ -1,5 +1,11 @@
 # Shared Responsibility Matrix Generator
 
+[![CI](https://github.com/blacksmith-infosec/shared-responsibility-matrix-generator/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/blacksmith-infosec/shared-responsibility-matrix-generator/actions/workflows/ci.yml)
+[![Line coverage](https://srm.blacksmithinfosec.com/coverage/line-coverage.svg)](https://srm.blacksmithinfosec.com/coverage/)
+[![Branch coverage](https://srm.blacksmithinfosec.com/coverage/branch-coverage.svg)](https://srm.blacksmithinfosec.com/coverage/)
+[![Node.js](https://img.shields.io/badge/Node.js-24.15.0-5FA04E?logo=nodedotjs&logoColor=white)](.nvmrc)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+
 Generate a one-page matrix showing how security responsibilities split between a vendor or platform provider, an MSP, and a client across the systems in the client's environment.
 
 Built for MSPs, vCISOs, and auditors who need a clear starting point for client conversations and managed services agreements. Open source under Apache 2.0. Built and maintained by [Blacksmith InfoSec](https://blacksmithinfosec.com).
@@ -14,6 +20,11 @@ Built for MSPs, vCISOs, and auditors who need a clear starting point for client 
 - Switch between light and dark themes while keeping the exported matrix on a white background.
 
 Each responsibility cell shows one dot per party: vendor, MSP, and client. A filled dot means the party is involved; multiple filled dots mean shared responsibility. An empty cell means no party has been assigned. These are involvement indicators, not percentage allocations.
+
+On narrow screens, scroll the matrix horizontally to reach every category. Keyboard users can focus the preview
+and scroll with the arrow keys. PNG and PDF exports always include the complete matrix in a consistent layout,
+regardless of the preview's width or scroll position. Screen readers can navigate its row and column headers and
+read the assigned parties in each cell.
 
 Template assignments are an opinionated starting point. Confirm the actual responsibility split in the managed services agreement and the relevant vendor documentation before treating the matrix as binding.
 
@@ -43,6 +54,7 @@ Open `http://localhost:8081`. `npm run dev` starts the same development server.
 | `npm run preview` | Serve the production build locally |
 | `npm run test:e2e` | Run browser behavior tests |
 | `npm run test:visual` | Compare browser screenshots with visual references |
+| `npm run coverage:prepare` | Add the latest coverage report and badges to an existing production build |
 
 Install the browser before running browser tests:
 
@@ -58,6 +70,30 @@ To run the behavior tests against the production build, run `npm run build`, the
 `PLAYWRIGHT_USE_PREVIEW=1 npm run test:e2e`. CI uses this mode to check the bundled application and exports.
 
 Visual references are specific to the operating system and browser. The initial references were captured on macOS; CI runs the functional browser tests on Linux. Review new screenshots before accepting them. See [CONTRIBUTING.md](CONTRIBUTING.md) for the testing workflow.
+
+ESLint 10 uses `@eslint/compat` for the React and accessibility plugins' older rule APIs. Their scoped peer-dependency
+overrides allow ESLint 10 without bypassing peer checks for other packages. Remove the overrides and compatibility
+wrappers when those plugins support ESLint 10 directly.
+
+### Coverage reports and badges
+
+`npm test` enforces 80% minimum coverage for statements, branches, functions, and lines. It writes HTML, LCOV, and
+JSON summary reports to `coverage/`. CI retains the reports as a `coverage-report` artifact and includes them in the
+GitHub Pages deployment. The README's coverage badges show line and branch coverage from the latest deployed `main`
+build and link to the full HTML report. They become available after the first deployment containing this setup;
+pull requests produce artifacts without changing the published badges. No coverage service or token is required.
+
+To preview the reports and badges locally:
+
+```bash
+npm test
+npm run build
+npm run coverage:prepare
+npm run preview
+```
+
+Open `/coverage/` on the preview server. Rebuild the reports after changing code or tests. The CI badge requires
+repository access while the repository is private.
 
 ## Project structure
 
@@ -139,6 +175,19 @@ npm run preview
 Serve the generated `dist/` directory on any static host, including GitHub Pages, Cloudflare Pages, Netlify, or Vercel. No backend or environment variables are required. Vite uses relative asset paths so the build also works under a project subpath.
 
 GitHub Actions runs lint, type checks, unit tests, the production build, and functional browser tests for pull requests and pushes to `main`. After all checks pass on `main`, the workflow uploads the tested `dist/` build and deploys it to GitHub Pages. Pull requests only run validation.
+
+The proposed [main branch ruleset](.github/rulesets/main.json) requires the `verify` check from GitHub Actions before merging. It preserves the existing pull request, approval, deletion, and force-push rules. This is a GitHub REST update payload; committing the file does not apply it to repository settings.
+
+Before applying it, compare the payload with the current [main ruleset](https://github.com/blacksmith-infosec/shared-responsibility-matrix-generator/rules/17762213), or inspect that ruleset using `gh api repos/blacksmith-infosec/shared-responsibility-matrix-generator/rulesets/17762213`. Reconcile any settings changed since the payload was prepared. An authenticated administrator can then apply the reviewed payload:
+
+```bash
+gh api --method PUT \
+  --header 'X-GitHub-Api-Version: 2026-03-10' \
+  repos/blacksmith-infosec/shared-responsibility-matrix-generator/rulesets/17762213 \
+  --input .github/rulesets/main.json
+```
+
+After applying, confirm that **Settings → Rules → Rulesets → main** lists `verify` from GitHub Actions as a required status check. The payload targets this repository's existing ruleset; forks need their own repository path and ruleset ID.
 
 The site is published at [srm.blacksmithinfosec.com](https://srm.blacksmithinfosec.com/). The repository's **Settings → Pages → Build and deployment → Source** must be set to **GitHub Actions**. Pushes to `main` deploy automatically; to redeploy manually, run **Lint, test, build, and deploy** from the Actions tab with the `main` branch selected. The `github-pages` environment and deployment job show the published site URL. An in-progress deployment finishes before the next `main` run starts.
 

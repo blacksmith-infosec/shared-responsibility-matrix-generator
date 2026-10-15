@@ -10,8 +10,8 @@ export const createFilename = (customer: string, extension: string): string => {
 };
 
 const escapeCsvCell = (value: string): string => {
-  // Spreadsheet programs execute formulas even in CSV-quoted fields.
-  const text = /^[\t\r\n]|^\s*[=+\-@]/.test(value) ? `'${value}` : value;
+  // Spreadsheet programs can also recognize full-width formula prefixes in some locales.
+  const text = /^[\t\r\n]|^\s*[=+\-@＝＋－＠]/.test(value) ? `'${value}` : value;
   return /[",\n\r]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
 };
 
@@ -43,12 +43,22 @@ export const downloadCsv = (systems: MatrixSystem[], customer: string): void => 
   }
 };
 
+const prepareImageCapture = (_document: Document, artifact: HTMLElement): void => {
+  // Render the complete matrix without changing the editor's size or scroll position.
+  artifact.style.width = '920px';
+  const matrixScroll = artifact.querySelector<HTMLElement>('.matrix-scroll');
+  if (!matrixScroll) return;
+  matrixScroll.style.overflow = 'visible';
+  matrixScroll.scrollLeft = 0;
+};
+
 export const downloadImage = async (artifact: HTMLElement, customer: string, format: ImageFormat): Promise<void> => {
   artifact.classList.add('is-exporting');
   try {
     const { default: html2canvas } = await import('html2canvas');
     const canvas = await html2canvas(artifact, {
       backgroundColor: '#FFFFFF', scale: 2, logging: false, useCORS: true,
+      onclone: prepareImageCapture,
     });
     const image = canvas.toDataURL('image/png');
     if (format === 'png') {

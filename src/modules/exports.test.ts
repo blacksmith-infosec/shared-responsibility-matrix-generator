@@ -23,6 +23,14 @@ describe('CSV export', () => {
     },
   );
 
+  it.each(['＝1+1', '＋SUM(A1)', '－1+2', '＠SUM(A1)', '   ＝1+1'])(
+    'exports full-width spreadsheet formula prefixes as literal text: %s', (value) => {
+      const system = { ...createSystem(1), name: value, vendor: value };
+      const row = createCsv([system]).split('\r\n')[1];
+      expect(row).toBe(`'${value},'${value},,,,,,,`);
+    },
+  );
+
   it('keeps ordinary text intact', () => {
     const system = { ...createSystem(1), name: 'Microsoft 365', vendor: 'Vendor' };
     expect(createCsv([system])).toContain('\r\nMicrosoft 365,Vendor,');
@@ -137,6 +145,7 @@ describe('image downloads', () => {
 
     expect(renderCanvas).toHaveBeenCalledExactlyOnceWith(artifact, {
       backgroundColor: '#FFFFFF', scale: 2, logging: false, useCORS: true,
+      onclone: expect.any(Function),
     });
     expect(canvas.toDataURL).toHaveBeenCalledExactlyOnceWith('image/png');
     expect(clickedLinks).toHaveLength(1);

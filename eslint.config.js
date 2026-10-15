@@ -1,4 +1,5 @@
 import js from '@eslint/js';
+import { fixupPluginRules } from '@eslint/compat';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 import react from 'eslint-plugin-react';
@@ -22,7 +23,8 @@ export default [
   },
   {
     files: ['src/**/*.tsx'],
-    plugins: { react, 'react-hooks': hooks, 'jsx-a11y': jsxA11y },
+    // These plugins still use rule APIs removed in ESLint 10.
+    plugins: { react: fixupPluginRules(react), 'react-hooks': hooks, 'jsx-a11y': fixupPluginRules(jsxA11y) },
     settings: { react: { version: 'detect' } },
     rules: {
       ...react.configs.recommended.rules,

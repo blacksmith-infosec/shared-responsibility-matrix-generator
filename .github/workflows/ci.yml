@@ -39,8 +39,20 @@ jobs:
       - name: Run unit and component tests
         run: npm test
 
+      - name: Upload coverage reports
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-report
+          path: coverage
+          if-no-files-found: ignore
+          retention-days: 14
+
       - name: Build
         run: npm run build
+
+      - name: Prepare coverage reports and badges for Pages
+        run: npm run coverage:prepare
 
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
