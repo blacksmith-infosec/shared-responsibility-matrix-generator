@@ -138,7 +138,9 @@ npm run preview
 
 Serve the generated `dist/` directory on any static host, including GitHub Pages, Cloudflare Pages, Netlify, or Vercel. No backend or environment variables are required. Vite uses relative asset paths so the build also works under a project subpath.
 
-GitHub Actions runs lint, type checks, unit tests, the production build, and functional browser tests for pull requests and pushes to `main`. The included workflow validates changes; deployment is configured by the chosen host.
+GitHub Actions runs lint, type checks, unit tests, the production build, and functional browser tests for pull requests and pushes to `main`. After all checks pass on `main`, the workflow uploads the tested `dist/` build and deploys it to GitHub Pages. Pull requests only run validation.
+
+The site is published at [srm.blacksmithinfosec.com](https://srm.blacksmithinfosec.com/). The repository's **Settings → Pages → Build and deployment → Source** must be set to **GitHub Actions**. Pushes to `main` deploy automatically; to redeploy manually, run **Lint, test, build, and deploy** from the Actions tab with the `main` branch selected. The `github-pages` environment and deployment job show the published site URL. An in-progress deployment finishes before the next `main` run starts.
 
 ## Contributing
 
