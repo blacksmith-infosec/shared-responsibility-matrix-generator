@@ -69,34 +69,39 @@ test.beforeEach(async ({ page }) => {
 });
 
 for (const width of [390, 768, 1000]) {
-  test(`keeps all responsibility columns reachable at ${width}px`, async ({ page }) => {
-    await page.setViewportSize({ width, height: 1000 });
-    const table = page.locator('#matrix');
-    const preview = table.locator('..');
-    const headers = table.locator('.m-hcell');
-    const cells = table.locator('.m-cell');
-    await expect(headers).toHaveCount(8);
-    await expect(cells).toHaveCount(7);
-    const headerPositions = await headers.evaluateAll((elements) => (
-      elements.map((element) => element.getBoundingClientRect().y)
-    ));
-    const cellPositions = await cells.evaluateAll((elements) => (
-      elements.map((element) => element.getBoundingClientRect().y)
-    ));
-    expect(new Set(headerPositions.map(Math.round)).size, 'category headers must share one row').toBe(1);
-    expect(new Set(cellPositions.map(Math.round)).size, 'responsibility cells must share one row').toBe(1);
-    await preview.focus();
-    await page.keyboard.press('ArrowRight');
-    await expect.poll(() => preview.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
-    await preview.evaluate((element) => { element.scrollLeft = element.scrollWidth; });
-    const bounds = await preview.boundingBox();
-    const logging = await headers.last().boundingBox();
-    expect(bounds).not.toBeNull();
-    expect(logging).not.toBeNull();
-    if (!bounds || !logging) throw new Error('Matrix preview or final column is not rendered');
-    expect(bounds.x + bounds.width).toBeLessThanOrEqual(width);
-    expect(logging.x).toBeGreaterThanOrEqual(bounds.x - 1);
-    expect(logging.x + logging.width).toBeLessThanOrEqual(bounds.x + bounds.width + 1);
+  test.describe(`${width}px viewport`, () => {
+    test.use({ viewport: { width, height: 1000 } });
+
+    test(`keeps all responsibility columns reachable at ${width}px`, async ({ page }) => {
+      const table = page.locator('#matrix');
+      const preview = table.locator('..');
+      const headers = table.locator('.m-hcell');
+      const cells = table.locator('.m-cell');
+      await expect(headers).toHaveCount(8);
+      await expect(cells).toHaveCount(7);
+      const headerPositions = await headers.evaluateAll((elements) => (
+        elements.map((element) => element.getBoundingClientRect().y)
+      ));
+      const cellPositions = await cells.evaluateAll((elements) => (
+        elements.map((element) => element.getBoundingClientRect().y)
+      ));
+      expect(new Set(headerPositions.map(Math.round)).size, 'category headers must share one row').toBe(1);
+      expect(new Set(cellPositions.map(Math.round)).size, 'responsibility cells must share one row').toBe(1);
+      // Verify keyboard navigation reaches the preview before testing native scrolling.
+      await page.getByRole('button', { name: 'Choose MSP logo' }).press('Tab');
+      await expect(preview).toBeFocused();
+      await page.keyboard.press('ArrowRight');
+      await expect.poll(() => preview.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
+      await preview.evaluate((element) => { element.scrollLeft = element.scrollWidth; });
+      const bounds = await preview.boundingBox();
+      const logging = await headers.last().boundingBox();
+      expect(bounds).not.toBeNull();
+      expect(logging).not.toBeNull();
+      if (!bounds || !logging) throw new Error('Matrix preview or final column is not rendered');
+      expect(bounds.x + bounds.width).toBeLessThanOrEqual(width);
+      expect(logging.x).toBeGreaterThanOrEqual(bounds.x - 1);
+      expect(logging.x + logging.width).toBeLessThanOrEqual(bounds.x + bounds.width + 1);
+    });
   });
 }
 

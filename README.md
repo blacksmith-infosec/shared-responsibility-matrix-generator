@@ -75,6 +75,11 @@ ESLint 10 uses `@eslint/compat` for the React and accessibility plugins' older r
 overrides allow ESLint 10 without bypassing peer checks for other packages. Remove the overrides and compatibility
 wrappers when those plugins support ESLint 10 directly.
 
+Builds and type checks use TypeScript 7.0.2 through the `@typescript/native` npm alias. The `typescript` dependency
+aliases `@typescript/typescript6` to provide the compiler API required by `typescript-eslint`. This follows
+[Microsoft's compatibility setup](https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/#running-side-by-side-with-typescript-60):
+`tsc` runs TypeScript 7, while `tsc6` remains available for tools that need TypeScript 6.
+
 ### Coverage reports and badges
 
 `npm test` enforces 80% minimum coverage for statements, branches, functions, and lines. It writes HTML, LCOV, and
