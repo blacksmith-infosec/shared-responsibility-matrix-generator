@@ -84,7 +84,7 @@ aliases `@typescript/typescript6` to provide the compiler API required by `types
 
 `npm test` enforces 80% minimum coverage for statements, branches, functions, and lines. It writes HTML, LCOV, and
 JSON summary reports to `coverage/`. CI retains the reports as a `coverage-report` artifact and includes them in the
-GitHub Pages deployment. The README's coverage badges show line and branch coverage from the latest deployed `main`
+GitHub Pages deployment. The README's coverage badges show line and branch coverage from the latest released
 build and link to the full HTML report. They become available after the first deployment containing this setup;
 pull requests produce artifacts without changing the published badges. No coverage service or token is required.
 
@@ -179,7 +179,7 @@ npm run preview
 
 Serve the generated `dist/` directory on any static host, including GitHub Pages, Cloudflare Pages, Netlify, or Vercel. No backend or environment variables are required. Vite uses relative asset paths so the build also works under a project subpath.
 
-GitHub Actions runs lint, type checks, unit tests, the production build, and functional browser tests for pull requests and pushes to `main`. After all checks pass on `main`, the workflow uploads the tested `dist/` build and deploys it to GitHub Pages. Pull requests only run validation.
+GitHub Actions runs lint, type checks, unit tests, the production build, and functional browser tests for pull requests, pushes to `main`, and release tags. Merging to `main` does **not** deploy. The workflow uploads the tested `dist/` build and deploys it to GitHub Pages only for a release: a manual run on `main`, or a pushed `v*` tag. Pull requests and ordinary pushes only run validation.
 
 The proposed [main branch ruleset](.github/rulesets/main.json) requires the `verify` check from GitHub Actions before merging. It preserves the existing pull request, approval, deletion, and force-push rules. This is a GitHub REST update payload; committing the file does not apply it to repository settings.
 
@@ -194,7 +194,21 @@ gh api --method PUT \
 
 After applying, confirm that **Settings → Rules → Rulesets → main** lists `verify` from GitHub Actions as a required status check. The payload targets this repository's existing ruleset; forks need their own repository path and ruleset ID.
 
-The site is published at [srm.blacksmithinfosec.com](https://srm.blacksmithinfosec.com/). The repository's **Settings → Pages → Build and deployment → Source** must be set to **GitHub Actions**. Pushes to `main` deploy automatically; to redeploy manually, run **Lint, test, build, and deploy** from the Actions tab with the `main` branch selected. The `github-pages` environment and deployment job show the published site URL. An in-progress deployment finishes before the next `main` run starts.
+The site is published at [srm.blacksmithinfosec.com](https://srm.blacksmithinfosec.com/). The repository's **Settings → Pages → Build and deployment → Source** must be set to **GitHub Actions**. The `github-pages` environment and deployment job show the published site URL.
+
+### Releasing
+
+Releases are deliberate so that a series of merged pull requests can be completed and checked before anything goes live.
+
+1. Confirm the release scope is complete on `main` and that all checks, including any release-specific visual review, have passed.
+2. Release in one of two ways:
+   - Tag the verified commit and push the tag, for example `git tag v1.1.0 <commit>` then `git push origin v1.1.0`.
+   - Or run **Lint, test, build, and deploy** from the Actions tab with the `main` branch selected.
+3. The `verify` job must pass before the Pages artifact is uploaded and the `deploy` job runs.
+
+Tag deployments require the `github-pages` environment to allow the tag. In **Settings → Environments → github-pages → Deployment branches and tags**, keep `main` and add a tag rule for `v*`.
+
+To roll back, re-run the deployment for the previous release tag (**Actions → the workflow run for that tag → Re-run all jobs**). Older builds may not understand saved links created by newer releases; note this in the release notes when the saved-link format changes.
 
 ## Contributing
 
