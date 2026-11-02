@@ -1,9 +1,21 @@
-import type { SystemTemplate } from '../types/matrix';
+import { cellsFromV1Positions } from '../modules/legacy';
+import type { Party, SystemTemplate } from '../types/matrix';
 
 // Client-facing systems for MSP-managed engagements. Product references are in README.md.
 // Assignments model platform operation, delegated administration, and client decisions;
 // confirm the actual service scope and delegation in each customer agreement.
-export const SYSTEM_TEMPLATES: SystemTemplate[] = [
+// INTERIM (PR 1): the pre-audit assignments, read through the frozen v1 map. Replaced by the approved
+// AUDIT.md draft 4 templates in PR 2. Not deployed (release gating).
+type LegacyKey = 'data' | 'identity' | 'endpoint' | 'network' | 'app' | 'backup' | 'logging';
+interface LegacyTemplate {
+  id: string;
+  name: string;
+  defaultVendor: string;
+  assignments: Record<LegacyKey, Party[]>;
+}
+const LEGACY_ORDER: LegacyKey[] = ['data', 'identity', 'endpoint', 'network', 'app', 'backup', 'logging'];
+
+const LEGACY_TEMPLATES: LegacyTemplate[] = [
   {
     id: 'm365',
     name: 'Microsoft 365',
@@ -340,3 +352,11 @@ export const SYSTEM_TEMPLATES: SystemTemplate[] = [
     },
   }
 ];
+
+export const SYSTEM_TEMPLATES: SystemTemplate[] = LEGACY_TEMPLATES.map((template) => ({
+  id: template.id,
+  name: template.name,
+  defaultVendor: template.defaultVendor,
+  scopeNote: '',
+  cells: cellsFromV1Positions(LEGACY_ORDER.map((key) => template.assignments[key].join(''))),
+}));

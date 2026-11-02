@@ -77,8 +77,8 @@ for (const width of [390, 768, 1000]) {
       const preview = table.locator('..');
       const headers = table.locator('.m-hcell');
       const cells = table.locator('.m-cell');
-      await expect(headers).toHaveCount(8);
-      await expect(cells).toHaveCount(7);
+      await expect(headers).toHaveCount(9);
+      await expect(cells).toHaveCount(8);
       const headerPositions = await headers.evaluateAll((elements) => (
         elements.map((element) => element.getBoundingClientRect().y)
       ));

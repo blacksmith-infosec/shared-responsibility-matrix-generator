@@ -2,7 +2,7 @@ import { Fragment, useEffect, useRef, useState } from 'react';
 import type { ChangeEvent, MouseEvent } from 'react';
 import { CATEGORIES } from '../../data/categories';
 import { SYSTEM_TEMPLATES } from '../../data/systems';
-import type { CategoryId, MatrixSystem, Party, SystemTemplate } from '../../types/matrix';
+import type { CategoryId, CellState, MatrixSystem, Party, ReviewFlag, SystemTemplate } from '../../types/matrix';
 
 interface SystemListProps {
   systems: MatrixSystem[];
@@ -11,6 +11,10 @@ interface SystemListProps {
   onChange: (id: string, field: 'name' | 'vendor', value: string) => void;
   onToggleExpanded: (id: string) => void;
   onToggleParty: (id: string, categoryId: CategoryId, party: Party) => void;
+  onCellState: (id: string, categoryId: CategoryId, state: CellState) => void;
+  onResolveVendor: (id: string, categoryId: CategoryId, participates: boolean) => void;
+  onScopeNote: (id: string, value: string) => void;
+  onReviewed: (id: string) => void;
 }
 
 interface SystemCardProps extends Omit<SystemListProps, 'systems' | 'onAdd'> {
@@ -23,8 +27,21 @@ const PARTIES: { id: Party; label: string }[] = [
   { id: 'c', label: 'Client' },
 ];
 
-const SystemCard = ({ system, onRemove, onChange, onToggleExpanded, onToggleParty }: SystemCardProps) => {
+const STATE_LABELS: Record<CellState, string> = { assigned: 'Assigned', na: 'N/A', unassigned: 'Unassigned' };
+
+const REVIEW_MESSAGES: Record<ReviewFlag, string> = {
+  categoriesBroadened: 'Category definitions changed since this matrix was saved. Check Data, Endpoint, Network, and Configuration.',
+  monitoringUnconfirmed: 'Monitoring was suggested from the old combined "Logging & response" column. Confirm it and fill in Incident response.',
+};
+
+const SystemCard = ({
+  system, onRemove, onChange, onToggleExpanded, onToggleParty, onCellState, onResolveVendor, onScopeNote, onReviewed,
+}: SystemCardProps) => {
   const systemName = system.name || 'Untitled system';
+  /** Shown after a scope edit in this session. Assignments are never changed automatically. */
+  const [scopeEdited, setScopeEdited] = useState(false);
+  const pendingFlags = (Object.keys(system.reviewFlags) as ReviewFlag[])
+    .filter((flag) => system.reviewFlags[flag] === 'pending');
 
   const handleToggle = () => onToggleExpanded(system.id);
   const handleToggleClick = (event: MouseEvent<HTMLButtonElement>) => {
@@ -73,28 +90,101 @@ const SystemCard = ({ system, onRemove, onChange, onToggleExpanded, onTogglePart
               placeholder="e.g. Microsoft" onChange={handleVendorChange}
             />
           </div>
+          <div className="card-field card-field-wide">
+            <label htmlFor={`${system.id}-scope`}>
+              Scope note <span className="field-hint">service, workloads, tier, and enabled features</span>
+            </label>
+            <textarea
+              id={`${system.id}-scope`} className="js-scope" rows={3} value={system.scopeNote}
+              placeholder="What this row covers and the assumptions behind it"
+              onChange={(event) => {
+                setScopeEdited(true);
+                onScopeNote(system.id, event.target.value);
+              }}
+            />
+            {scopeEdited && (
+              <p className="scope-review" role="status">
+                Scope changed. Review this row&apos;s assignments; they are not updated automatically.
+                {' '}<button className="btn-link js-scope-dismiss" type="button" onClick={() => setScopeEdited(false)}>
+                  Dismiss
+                </button>
+              </p>
+            )}
+          </div>
         </div>
+        {pendingFlags.length > 0 && (
+          <div className="review-flags" role="status">
+            <ul>
+              {pendingFlags.map((flag) => <li key={flag}>{REVIEW_MESSAGES[flag]}</li>)}
+            </ul>
+            {system.provenance && system.provenance.loggingResponse.length > 0 && (
+              <p className="review-provenance">
+                Originally saved as Logging &amp; response:
+                {' '}{system.provenance.loggingResponse.map((party) => party.toUpperCase()).join(' ')}
+              </p>
+            )}
+            <button type="button" className="btn-thin js-reviewed" onClick={() => onReviewed(system.id)}>
+              Mark reviewed
+            </button>
+          </div>
+        )}
         <div className="resp-grid">
           <div className="resp-head label-col">Category</div>
           <div className="resp-head">V</div>
           <div className="resp-head">M</div>
           <div className="resp-head">C</div>
-          {CATEGORIES.map((category) => (
-            <Fragment key={category.id}>
-              <div className="resp-row-label">{`${category.main} ${category.sub}`}</div>
-              {PARTIES.map((party) => {
-                const isSelected = system.assignments[category.id].includes(party.id);
-                return (
-                  <button
-                    key={party.id} type="button" className={`party-toggle ${party.id} ${isSelected ? 'on' : ''}`}
-                    data-cat={category.id} data-party={party.id} title={`Toggle ${party.id.toUpperCase()}`}
-                    aria-label={`${party.label}: ${category.main} ${category.sub}`} aria-pressed={isSelected}
-                    onClick={() => onToggleParty(system.id, category.id, party.id)}
-                  />
-                );
-              })}
-            </Fragment>
-          ))}
+          <div className="resp-head">State</div>
+          {CATEGORIES.map((category) => {
+            const cell = system.cells[category.id];
+            const label = `${category.main} ${category.sub}`;
+            return (
+              <Fragment key={category.id}>
+                <div className="resp-row-label" title={category.definition}>{label}</div>
+                {PARTIES.map((party) => {
+                  const isSelected = cell.parties.includes(party.id);
+                  const isLocked = cell.state === 'na' || (party.id === 'v' && Boolean(cell.vendorUnverified));
+                  return (
+                    <button
+                      key={party.id} type="button" className={`party-toggle ${party.id} ${isSelected ? 'on' : ''}`}
+                      data-cat={category.id} data-party={party.id} title={`Toggle ${party.id.toUpperCase()}`}
+                      aria-label={`${party.label}: ${label}`} aria-pressed={isSelected} disabled={isLocked}
+                      onClick={() => onToggleParty(system.id, category.id, party.id)}
+                    />
+                  );
+                })}
+                <select
+                  className={`cell-state ${cell.state}`} data-cat={category.id} value={cell.state}
+                  aria-label={`State: ${label}`}
+                  onChange={(event) => onCellState(system.id, category.id, event.target.value as CellState)}
+                >
+                  {(Object.keys(STATE_LABELS) as CellState[]).map((option) => (
+                    <option key={option} value={option}
+                      disabled={(option === 'assigned' && (cell.parties.length === 0 || Boolean(cell.vendorUnverified)))
+                        || (option === 'na' && Boolean(cell.vendorUnverified))}
+                    >{STATE_LABELS[option]}</option>
+                  ))}
+                </select>
+                {cell.vendorUnverified && (
+                  <div className="cell-detail unverified" data-cat={category.id}>
+                    <span className="cell-detail-label">Vendor role unverified.</span>
+                    {cell.vendorUnverified.note && <span> {cell.vendorUnverified.note}</span>}
+                    <span className="cell-detail-actions">
+                      <button type="button" className="text-link js-vendor-yes"
+                        onClick={() => onResolveVendor(system.id, category.id, true)}>Vendor participates</button>
+                      <button type="button" className="text-link js-vendor-no"
+                        onClick={() => onResolveVendor(system.id, category.id, false)}>Vendor does not participate</button>
+                    </span>
+                  </div>
+                )}
+                {cell.limitedRecovery && (
+                  <div className="cell-detail limited" data-cat={category.id}>
+                    <span className="cell-detail-label">Limited recovery.</span>
+                    {cell.limitedRecovery.note && <span> {cell.limitedRecovery.note}</span>}
+                  </div>
+                )}
+              </Fragment>
+            );
+          })}
         </div>
       </div>
     </div>

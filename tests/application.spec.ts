@@ -1,7 +1,16 @@
+import { inflateRawSync } from 'node:zlib';
 import { expect, test } from '@playwright/test';
 import { addTemplate, preparePage, readDownload } from './browser-helpers';
 
-const categories = ['data', 'identity', 'endpoint', 'network', 'app', 'backup', 'logging'];
+// Interim templates (PR 1) are the pre-audit assignments read through the frozen v1 map, so the seven
+// legacy positions land in these columns; Incident response starts unassigned.
+const categories = ['data', 'identity', 'endpoint', 'network', 'config', 'backup', 'monitoring'];
+
+const decodeV2 = (hash: string) => {
+  expect(hash.startsWith('2.')).toBe(true);
+  const base64 = hash.slice(2).replace(/-/g, '+').replace(/_/g, '/');
+  return JSON.parse(inflateRawSync(Buffer.from(base64, 'base64')).toString('utf8'));
+};
 const templates = [
   { id: 'm365', name: 'Microsoft 365', vendor: 'Microsoft', assignments: ['mc', 'vm', '', 'v', 'vm', 'm', 'vm'] },
   { id: 'entra', name: 'Microsoft Entra ID', vendor: 'Microsoft', assignments: ['', 'vm', '', 'v', 'vm', 'v', 'vm'] },
@@ -84,7 +93,7 @@ test('starts with the empty form, preview, and common client quickstarts', async
   await expect(page.locator('#reset-all')).toBeHidden();
   await expect(page.locator('#artifact-customer')).toHaveText('Customer name');
   await expect(page.locator('#artifact-msp')).toHaveText('MSP name');
-  await expect(page.locator('#artifact-date')).toHaveText('October 2026');
+  await expect(page.locator('#artifact-date')).toHaveText('October 14, 2026');
   await expect(page.locator('.artifact-quickstart-btn')).toHaveText([
     'Microsoft 365', 'Windows endpoints', 'Fortinet FortiGate', 'Datto SIRIS',
   ]);
@@ -105,12 +114,13 @@ test('updates client branding immediately and restores Unicode from a bookmarked
   await card.locator('[data-cat="data"][data-party="c"]').click();
   await expect.poll(() => new URL(page.url()).hash).not.toBe('');
   await expect.poll(async () => {
-    const hash = new URL(page.url()).hash.slice(1);
-    return JSON.parse(Buffer.from(hash, 'base64').toString('utf8')).s[0];
+    const hash = decodeURIComponent(new URL(page.url()).hash.slice(1));
+    if (!hash.startsWith('2.')) return null;
+    return decodeV2(hash).s[0];
   }).toMatchObject({
     n: 'Système 数据',
-    v: 'Équipe "Cloud"',
-    a: ['mc', '', '', '', '', '', ''],
+    vd: 'Équipe "Cloud"',
+    a: { data: { p: 'mc', st: 'u' }, identity: { p: '', st: 'u' } },
   });
   await page.reload();
   await expect(page.locator('#customer')).toHaveValue('München 客户 🔒');
@@ -218,7 +228,7 @@ test('adds, edits, collapses, and removes a custom system with shared responsibi
   await expect(card).toHaveClass(/expanded/);
   await expect(card.locator('.card-name-display')).toHaveText('Untitled system');
   await expect(page.locator('#system-count')).toHaveText('1 system');
-  await expect(page.locator('#matrix .na')).toHaveCount(7);
+  await expect(page.locator('#matrix .na')).toHaveCount(8);
   await card.locator('.js-name').fill('CRM & "Sales" <suite>');
   await card.locator('.js-vendor').fill('Example, Inc.');
   await expect(page.locator('#matrix .m-rlabel')).toContainText('CRM & "Sales" <suite>');
@@ -316,8 +326,9 @@ test('downloads correctly quoted CSV and valid PNG and PDF files', async ({ page
   const csv = await csvPromise;
   expect(csv.suggestedFilename()).toBe('srm-example-partners.csv');
   expect((await readDownload(csv)).toString('utf8')).toBe(
-    'System,Vendor,Data classification,Identity access,Endpoint protection,Network controls,App security & patching,Backup recovery,Logging & response\r\n'
-    + '"CRM, ""Sales""","Example, Inc.",VMC,,,,,,',
+    'System,Vendor,Data protection,Identity & access,Endpoint security,Network security,Configuration & patching,'
+    + 'Backup & recovery,Monitoring & detection,Incident response\r\n'
+    + '"CRM, ""Sales""","Example, Inc.",VMC,,,,,,,',
   );
 
   const pngPromise = page.waitForEvent('download');
@@ -356,6 +367,6 @@ test('exports shared-link system names and vendors as text instead of spreadshee
   const downloadPromise = page.waitForEvent('download');
   await page.locator('#download-csv').click();
   const csv = (await readDownload(await downloadPromise)).toString('utf8');
-  expect(csv.split('\r\n')[1]).toBe("'=1+1,'+1+1,,,,,,,");
+  expect(csv.split('\r\n')[1]).toBe("'=1+1,'+1+1,,,,,,,,");
 });
 

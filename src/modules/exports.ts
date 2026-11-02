@@ -20,8 +20,9 @@ export const createCsv = (systems: MatrixSystem[]): string => {
   const rows = systems.map((system) => [
     system.name,
     system.vendor,
+    // Interim (PR 1): parties only. The fixed CSV schema with state and qualifier columns lands in PR 4.
     ...CATEGORIES.map((category) => PARTIES
-      .filter((party) => system.assignments[category.id].includes(party)).join('').toUpperCase()),
+      .filter((party) => system.cells[category.id].parties.includes(party)).join('').toUpperCase()),
   ]);
   return [headers, ...rows].map((row) => row.map(escapeCsvCell).join(',')).join('\r\n');
 };

@@ -34,14 +34,18 @@ describe('client-facing system catalog', () => {
     expect(createSystem(1, getTemplate(id))).toMatchObject({ templateId: id, name, vendor });
   });
 
-  it('keeps every template addressable with valid assignments for all seven categories', () => {
+  it('keeps every template addressable with eight valid cells that follow the cell rules', () => {
     const ids = SYSTEM_TEMPLATES.map((template) => template.id);
     expect(new Set(ids).size).toBe(ids.length);
     for (const template of SYSTEM_TEMPLATES) {
-      expect(Object.keys(template.assignments).sort()).toEqual(CATEGORIES.map((category) => category.id).sort());
-      for (const parties of Object.values(template.assignments)) {
-        expect(new Set(parties).size).toBe(parties.length);
-        expect(parties.every((party) => ['v', 'm', 'c'].includes(party))).toBe(true);
+      expect(Object.keys(template.cells)).toEqual(CATEGORIES.map((category) => category.id));
+      for (const cell of Object.values(template.cells)) {
+        expect(new Set(cell.parties).size).toBe(cell.parties.length);
+        expect(cell.parties.every((party) => ['v', 'm', 'c'].includes(party))).toBe(true);
+        if (cell.state === 'assigned') expect(cell.parties.length).toBeGreaterThan(0);
+        if (cell.state === 'na') expect(cell.parties).toEqual([]);
+        if (cell.vendorUnverified) expect(cell.parties).not.toContain('v');
+        if (cell.limitedRecovery) expect(cell.parties).toContain('v');
       }
     }
   });
@@ -50,24 +54,9 @@ describe('client-facing system catalog', () => {
     expect(SYSTEM_TEMPLATES.some((template) => /\b(?:RMM|PSA|Automate)\b/i.test(template.name))).toBe(false);
   });
 
-  it('includes Huntress managed response and keeps EDR separate from backup', () => {
-    const huntress = createSystem(1, getTemplate('huntress'));
-    expect(huntress.assignments.endpoint).toEqual(expect.arrayContaining(['v', 'm']));
-    expect(huntress.assignments.logging).toEqual(expect.arrayContaining(['v', 'm']));
-    for (const id of ['defender', 'huntress', 'sentinelone', 'dnsfilter']) {
-      expect(createSystem(1, getTemplate(id)).assignments.backup).toEqual([]);
-    }
-  });
-
-  it.each(['backup', 'datto-saas', 'cove'])('includes vendor backup infrastructure for %s', (id) => {
-    const system = createSystem(1, getTemplate(id));
-    expect(system.assignments.backup).toEqual(expect.arrayContaining(['v', 'm']));
-    expect(system.assignments.endpoint).toEqual([]);
-  });
-
-  it('leaves accounting data and recovery decisions with the client', () => {
-    const quickbooks = createSystem(1, getTemplate('quickbooks'));
-    expect(quickbooks.assignments.data).toEqual(['c']);
-    expect(quickbooks.assignments.backup).toEqual(['c']);
+  it('keeps legacy template ids so existing quick-start buttons and saved links still resolve', () => {
+    expect(SYSTEM_TEMPLATES.map((template) => template.id)).toEqual(expect.arrayContaining(
+      ['m365', 'endpoints', 'network', 'backup'],
+    ));
   });
 });

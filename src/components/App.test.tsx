@@ -18,7 +18,7 @@ describe('matrix application', () => {
     fireEvent.change(within(card).getByLabelText('System name'), { target: { value: 'Office' } });
     fireEvent.change(within(card).getByLabelText('Vendor'), { target: { value: 'Vendor' } });
     expect(document.querySelector('.m-rlabel')).toHaveTextContent('Office Vendor');
-    fireEvent.click(within(card).getByRole('button', { name: /Vendor.*Data classification/i }));
+    fireEvent.click(within(card).getByRole('button', { name: /Vendor.*Data protection/i }));
     expect(document.querySelector('.m-cell .dot.v')).toHaveClass('on');
     fireEvent.click(within(card).getByRole('button', { name: 'Expand/collapse' }));
     expect(card).not.toHaveClass('expanded');
@@ -114,5 +114,33 @@ describe('matrix application', () => {
     fireEvent.click(screen.getByRole('button', { name: 'PDF' }));
     await waitFor(() => expect(alert).toHaveBeenCalledWith('Could not generate the PDF. See console.'));
     expect(screen.getByRole('button', { name: 'PDF' })).toBeEnabled();
+  });
+
+  it('shows a protected-link notice instead of the editor and starts a new matrix on request', () => {
+    history.replaceState(null, '', '/#3.future');
+    render(<App />);
+    expect(screen.getByRole('alert')).toHaveTextContent('newer version');
+    expect(screen.queryByLabelText(/Client name/)).not.toBeInTheDocument();
+    expect(location.hash).toBe('#3.future');
+    fireEvent.click(screen.getByRole('button', { name: 'Start a new matrix' }));
+    expect(screen.getByLabelText(/Client name/)).toBeInTheDocument();
+    expect(location.hash).toBe('');
+  });
+
+  it('edits the prepared date, scope note, cell state, and vendor resolution through the editor', () => {
+    history.replaceState(null, '', '/');
+    render(<App />);
+    fireEvent.change(screen.getByLabelText(/Prepared date/), { target: { value: '2026-09-30' } });
+    expect(document.getElementById('artifact-date')).toHaveTextContent('September 30, 2026');
+    fireEvent.change(screen.getByLabelText(/Prepared date/), { target: { value: '' } });
+    expect(document.getElementById('artifact-date')).toHaveTextContent('Date not recorded');
+    fireEvent.click(screen.getByRole('button', { name: 'Microsoft 365' }));
+    expect(document.getElementById('matrix-status')).toHaveTextContent('Draft');
+    const card = document.querySelector('.system-card') as HTMLElement;
+    fireEvent.change(within(card).getByLabelText(/Scope note/), { target: { value: 'Tenant only' } });
+    expect(within(card).getByLabelText(/Scope note/)).toHaveValue('Tenant only');
+    const endpoint = within(card).getByRole('combobox', { name: 'State: Endpoint security' });
+    fireEvent.change(endpoint, { target: { value: 'na' } });
+    expect(endpoint).toHaveValue('na');
   });
 });

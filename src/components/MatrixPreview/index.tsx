@@ -2,12 +2,13 @@ import type { KeyboardEvent, RefObject } from 'react';
 import { CATEGORIES } from '../../data/categories';
 import { SYSTEM_TEMPLATES } from '../../data/systems';
 import { PARTIES } from '../../modules/matrix';
-import type { MatrixSystem, Party, SystemTemplate } from '../../types/matrix';
+import type { Cell, MatrixSystem, Party, SystemTemplate } from '../../types/matrix';
 import { BrandMark } from '../BrandMark';
 
 interface MatrixPreviewProps {
   customer: string;
   msp: string;
+  preparedDate: string | null;
   systems: MatrixSystem[];
   logoDataUrl: string | null;
   onChooseLogo: () => void;
@@ -22,11 +23,30 @@ const VENDOR_NOTE = 'Vendor platform security and any contracted managed securit
   + 'unless explicitly delegated.';
 const PARTY_LABELS: Record<Party, string> = { v: 'Vendor', m: 'MSP', c: 'Client' };
 
-const MatrixCell = ({ parties }: { parties: Party[] }) => {
-  const selectedParties = PARTIES.filter((party) => parties.includes(party));
-  const label = selectedParties.map((party) => PARTY_LABELS[party]).join(', ') || 'Unassigned';
+// Interim rendering (PR 1): dots for known parties. Final markers, N/A vs Unassigned and qualifiers arrive in PR 3.
+const describeCell = (cell: Cell) => {
+  const parties = PARTIES.filter((party) => cell.parties.includes(party)).map((party) => PARTY_LABELS[party]);
+  const parts = [...parties];
+  if (cell.state === 'na') parts.push('Not applicable');
+  if (cell.state === 'unassigned') parts.push('Unassigned');
+  if (cell.vendorUnverified) parts.push('Vendor role unverified');
+  if (cell.limitedRecovery) parts.push('Limited recovery');
+  return parts.join(', ');
+};
+
+export const formatPreparedDate = (preparedDate: string | null): string => {
+  if (!preparedDate) return 'Date not recorded';
+  const [year, month, day] = preparedDate.split('-').map(Number);
+  // Built in UTC with setUTCFullYear so years 0-99 are not remapped to 1900-1999.
+  const date = new Date(0);
+  date.setUTCFullYear(year, month - 1, day);
+  return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+};
+
+const MatrixCell = ({ cell }: { cell: Cell }) => {
+  const parties: Party[] = cell.parties;
   return (
-    <td className="m-cell" aria-label={label}>
+    <td className={`m-cell state-${cell.state}`} aria-label={describeCell(cell)}>
       {parties.length === 0 ? <span className="na" aria-hidden="true">—</span> : PARTIES.map((party) => (
         <span key={party} className={`dot ${party} ${parties.includes(party) ? 'on' : 'off'}`} aria-hidden="true" />
       ))}
@@ -35,9 +55,9 @@ const MatrixCell = ({ parties }: { parties: Party[] }) => {
 };
 
 export const MatrixPreview = ({
-  customer, msp, systems, logoDataUrl, onChooseLogo, onAdd, artifactRef,
+  customer, msp, preparedDate, systems, logoDataUrl, onChooseLogo, onAdd, artifactRef,
 }: MatrixPreviewProps) => {
-  const dateLabel = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  const dateLabel = formatPreparedDate(preparedDate);
   const handleLogoKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key !== 'Enter' && event.key !== ' ') return;
     event.preventDefault();
@@ -114,7 +134,7 @@ export const MatrixPreview = ({
                         {system.vendor && <> <span className="m-rsub">{system.vendor}</span></>}
                       </th>
                       {CATEGORIES.map((category) => (
-                        <MatrixCell key={category.id} parties={system.assignments[category.id]} />
+                        <MatrixCell key={category.id} cell={system.cells[category.id]} />
                       ))}
                     </tr>
                   ))}

@@ -7,11 +7,11 @@ describe('CSV export', () => {
     const system = createSystem(1);
     system.name = 'Mail, "Primary"';
     system.vendor = 'Line\nTwo';
-    system.assignments.data = ['c', 'v', 'm'];
+    system.cells.data = { parties: ['v', 'm', 'c'], state: 'assigned' };
     expect(createCsv([system])).toBe(
-      'System,Vendor,Data classification,Identity access,Endpoint protection,Network controls,' +
-      'App security & patching,Backup recovery,Logging & response\r\n' +
-      '"Mail, ""Primary""","Line\nTwo",VMC,,,,,,',
+      'System,Vendor,Data protection,Identity & access,Endpoint security,Network security,' +
+      'Configuration & patching,Backup & recovery,Monitoring & detection,Incident response\r\n' +
+      '"Mail, ""Primary""","Line\nTwo",VMC,,,,,,,',
     );
   });
 
@@ -27,7 +27,7 @@ describe('CSV export', () => {
     'exports full-width spreadsheet formula prefixes as literal text: %s', (value) => {
       const system = { ...createSystem(1), name: value, vendor: value };
       const row = createCsv([system]).split('\r\n')[1];
-      expect(row).toBe(`'${value},'${value},,,,,,,`);
+      expect(row).toBe(`'${value},'${value},,,,,,,,`);
     },
   );
 
@@ -67,7 +67,7 @@ describe('CSV downloads', () => {
 
   it('downloads the CSV contents and filename, then releases its object URL', async () => {
     const system = { ...createSystem(1), name: 'Client email', vendor: 'Microsoft' };
-    system.assignments.identity = ['m', 'v'];
+    system.cells.identity = { parties: ['v', 'm'], state: 'assigned' };
     const clickedLinks: HTMLAnchorElement[] = [];
     vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (this: HTMLAnchorElement) {
       clickedLinks.push(this);
@@ -82,9 +82,9 @@ describe('CSV downloads', () => {
     const blob = createObjectURL.mock.calls[0][0];
     expect(blob.type).toBe('text/csv;charset=utf-8;');
     expect(await readBlobText(blob)).toBe(
-      'System,Vendor,Data classification,Identity access,Endpoint protection,Network controls,' +
-      'App security & patching,Backup recovery,Logging & response\r\n' +
-      'Client email,Microsoft,,VM,,,,,',
+      'System,Vendor,Data protection,Identity & access,Endpoint security,Network security,' +
+      'Configuration & patching,Backup & recovery,Monitoring & detection,Incident response\r\n' +
+      'Client email,Microsoft,,VM,,,,,,',
     );
     expect(revokeObjectURL).toHaveBeenCalledExactlyOnceWith('blob:matrix-download');
   });

@@ -5,10 +5,10 @@ import { describe, expect, it, vi } from 'vitest';
 import { SYSTEM_TEMPLATES } from '../../data/systems';
 import { createSystem } from '../../modules/matrix';
 import type { MatrixSystem } from '../../types/matrix';
-import { MatrixPreview } from './index';
+import { formatPreparedDate, MatrixPreview } from './index';
 
 const defaultProps = {
-  customer: '', msp: '', systems: [], logoDataUrl: null,
+  customer: '', msp: '', preparedDate: '2026-10-14' as string | null, systems: [], logoDataUrl: null,
   onChooseLogo: vi.fn(), onAdd: vi.fn(), artifactRef: createRef<HTMLDivElement>(),
 };
 
@@ -17,9 +17,11 @@ describe('MatrixPreview', () => {
     const system = createSystem(1);
     system.name = 'Client infrastructure';
     system.vendor = 'Example vendor';
-    system.assignments = {
-      data: ['v'], identity: ['m'], endpoint: ['c'], network: ['c', 'v'],
-      app: ['c', 'v', 'm'], backup: [], logging: ['m', 'v'],
+    const assigned = (parties: MatrixSystem['cells']['data']['parties']) => ({ parties, state: 'assigned' as const });
+    system.cells = {
+      data: assigned(['v']), identity: assigned(['m']), endpoint: assigned(['c']), network: assigned(['v', 'c']),
+      config: assigned(['v', 'm', 'c']), backup: { parties: [], state: 'unassigned' }, monitoring: assigned(['v', 'm']),
+      response: { parties: [], state: 'na' },
     };
     render(<MatrixPreview {...defaultProps} systems={[system, { ...createSystem(2), name: 'Email' }]} />);
 
@@ -29,9 +31,9 @@ describe('MatrixPreview', () => {
     const rows = within(table).getAllByRole('row');
     expect(rows).toHaveLength(3);
     const columns = within(rows[0]).getAllByRole('columnheader');
-    expect(columns).toHaveLength(8);
+    expect(columns).toHaveLength(9);
     expect(columns[0]).toHaveAccessibleName('System');
-    expect(columns[1]).toHaveAccessibleName('Data classification');
+    expect(columns[1]).toHaveAccessibleName('Data protection');
     columns.forEach((column) => expect(column).toHaveAttribute('scope', 'col'));
 
     const firstSystem = within(rows[1]);
@@ -39,7 +41,8 @@ describe('MatrixPreview', () => {
     expect(rowHeader).toHaveAttribute('scope', 'row');
     expect(rowHeader).toHaveAccessibleName('Client infrastructure Example vendor');
     const cells = firstSystem.getAllByRole('cell');
-    const partyLabels = ['Vendor', 'MSP', 'Client', 'Vendor, Client', 'Vendor, MSP, Client', 'Unassigned', 'Vendor, MSP'];
+    const partyLabels = ['Vendor', 'MSP', 'Client', 'Vendor, Client', 'Vendor, MSP, Client', 'Unassigned', 'Vendor, MSP',
+      'Not applicable'];
     expect(cells).toHaveLength(partyLabels.length);
     cells.forEach((cell, index) => expect(cell).toHaveAccessibleName(partyLabels[index]));
     expect(within(rows[2]).getByRole('rowheader')).toHaveAccessibleName('Email');
@@ -66,18 +69,15 @@ describe('MatrixPreview', () => {
   });
 
   it('renders every responsibility column and preserves party dot order', () => {
-    const system: MatrixSystem = {
-      id: 'sys-1', templateId: 'm365', name: 'Microsoft 365', vendor: 'Microsoft',
-      assignments: SYSTEM_TEMPLATES[0].assignments, expanded: true,
-    };
+    const system: MatrixSystem = createSystem(1, SYSTEM_TEMPLATES[0]);
     const { container } = render(
       <MatrixPreview {...defaultProps} customer="Acme" msp="Example MSP" systems={[system]} />,
     );
     expect(screen.queryByText('Start with a template')).not.toBeInTheDocument();
     expect(screen.getByText('Acme')).toBeInTheDocument();
     expect(screen.getByText('Example MSP')).toBeInTheDocument();
-    expect(container.querySelectorAll('.m-hcell')).toHaveLength(8);
-    expect(container.querySelectorAll('.m-cell')).toHaveLength(7);
+    expect(container.querySelectorAll('.m-hcell')).toHaveLength(9);
+    expect(container.querySelectorAll('.m-cell')).toHaveLength(8);
     const dataDots = container.querySelectorAll('.m-cell')[0].querySelectorAll('.dot');
     expect(dataDots[0]).toHaveClass('v', 'off');
     expect(dataDots[1]).toHaveClass('m', 'on');
@@ -87,10 +87,7 @@ describe('MatrixPreview', () => {
   });
 
   it('renders blank and hostile system names as plain text', () => {
-    const system: MatrixSystem = {
-      id: 'sys-1', templateId: null, name: '', vendor: '',
-      assignments: SYSTEM_TEMPLATES[0].assignments, expanded: true,
-    };
+    const system: MatrixSystem = { ...createSystem(1, SYSTEM_TEMPLATES[0]), templateId: null, name: '', vendor: '' };
     const { container, rerender } = render(<MatrixPreview {...defaultProps} systems={[system]} />);
     expect(screen.getByText('Untitled system')).toBeInTheDocument();
     expect(container.querySelector('.m-rsub')).not.toBeInTheDocument();
@@ -113,10 +110,19 @@ describe('MatrixPreview', () => {
     expect(screen.queryByRole('button', { name: 'Choose MSP logo' })).not.toBeInTheDocument();
   });
 
-  it('formats the current month and year', () => {
+  it('shows the stored prepared date and never substitutes today', () => {
     vi.useFakeTimers();
-    vi.setSystemTime(new Date('2026-10-14T12:00:00Z'));
-    render(<MatrixPreview {...defaultProps} />);
-    expect(screen.getByText('October 2026')).toBeInTheDocument();
+    vi.setSystemTime(new Date('2027-03-01T12:00:00Z'));
+    const { rerender } = render(<MatrixPreview {...defaultProps} />);
+    expect(screen.getByText('October 14, 2026')).toBeInTheDocument();
+    rerender(<MatrixPreview {...defaultProps} preparedDate={null} />);
+    expect(screen.getByText('Date not recorded')).toBeInTheDocument();
+  });
+
+  it('formats saved dates exactly, including leap days and two-digit years', () => {
+    expect(formatPreparedDate('2024-02-29')).toBe('February 29, 2024');
+    expect(formatPreparedDate('2026-10-14')).toBe('October 14, 2026');
+    expect(formatPreparedDate('0099-12-31')).toBe('December 31, 99');
+    expect(formatPreparedDate(null)).toBe('Date not recorded');
   });
 });

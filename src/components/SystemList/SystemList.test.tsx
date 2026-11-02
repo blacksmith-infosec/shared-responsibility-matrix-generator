@@ -1,18 +1,17 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { SYSTEM_TEMPLATES } from '../../data/systems';
+import { createSystem } from '../../modules/matrix';
 import type { MatrixSystem } from '../../types/matrix';
 import { SystemList } from './index';
 
-const microsoft365: MatrixSystem = {
-  id: 'sys-1', templateId: 'm365', name: 'Microsoft 365', vendor: 'Microsoft',
-  assignments: SYSTEM_TEMPLATES[0].assignments, expanded: true,
-};
+const microsoft365: MatrixSystem = createSystem(1, SYSTEM_TEMPLATES[0]);
 
 const createHandlers = () => ({
   onAdd: vi.fn(), onRemove: vi.fn(), onChange: vi.fn(),
-  onToggleExpanded: vi.fn(), onToggleParty: vi.fn(),
+  onToggleExpanded: vi.fn(), onToggleParty: vi.fn(), onCellState: vi.fn(), onResolveVendor: vi.fn(),
+  onScopeNote: vi.fn(), onReviewed: vi.fn(),
 });
 
 describe('SystemList', () => {
@@ -94,8 +93,8 @@ describe('SystemList', () => {
     expect(handlers.onChange).toHaveBeenCalledWith('sys-1', 'name', 'Client mail');
     expect(handlers.onChange).toHaveBeenCalledWith('sys-1', 'vendor', 'Mail vendor');
 
-    const clientData = screen.getByRole('button', { name: 'Client: Data classification' });
-    const vendorData = screen.getByRole('button', { name: 'Vendor: Data classification' });
+    const clientData = screen.getByRole('button', { name: 'Client: Data protection' });
+    const vendorData = screen.getByRole('button', { name: 'Vendor: Data protection' });
     expect(clientData).toHaveAttribute('aria-pressed', 'true');
     expect(vendorData).toHaveAttribute('aria-pressed', 'false');
     await user.click(vendorData);
@@ -155,5 +154,73 @@ describe('SystemList', () => {
     );
     expect(screen.getByText('Untitled system')).toHaveClass('placeholder');
     expect(container.querySelector('.card-vendor-display')).toBeEmptyDOMElement();
+  });
+
+  it('edits the scope note and cell state, and locks controls the cell rules forbid', async () => {
+    const user = userEvent.setup();
+    const handlers = createHandlers();
+    const system = createSystem(1, SYSTEM_TEMPLATES[0]);
+    system.cells.endpoint = { parties: [], state: 'na' };
+    system.cells.response = { parties: ['c'], state: 'unassigned' };
+    render(<SystemList systems={[system]} {...handlers} />);
+    fireEvent.change(screen.getByRole('textbox', { name: /Scope note/ }), { target: { value: 'Tenant only' } });
+    expect(handlers.onScopeNote).toHaveBeenCalledWith('sys-1', 'Tenant only');
+    expect(screen.getByRole('button', { name: 'MSP: Endpoint security' })).toBeDisabled();
+    const responseState = screen.getByRole('combobox', { name: 'State: Incident response' });
+    expect(responseState).toHaveValue('unassigned');
+    await user.selectOptions(responseState, 'assigned');
+    expect(handlers.onCellState).toHaveBeenCalledWith('sys-1', 'response', 'assigned');
+    const emptyState = screen.getByRole('combobox', { name: 'State: Endpoint security' });
+    expect(within(emptyState).getByRole('option', { name: 'Assigned' })).toBeDisabled();
+  });
+
+  it('offers explicit vendor-role resolution and shows limited recovery', async () => {
+    const user = userEvent.setup();
+    const handlers = createHandlers();
+    const system = createSystem(1, SYSTEM_TEMPLATES[0]);
+    system.cells.config = { parties: ['m'], state: 'unassigned', vendorUnverified: { note: 'No public statement.' } };
+    system.cells.backup = { parties: ['v', 'm'], state: 'assigned', limitedRecovery: { note: '14 days.' } };
+    render(<SystemList systems={[system]} {...handlers} />);
+    expect(screen.getByText('No public statement.')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Vendor: Configuration & patching' })).toBeDisabled();
+    const configState = screen.getByRole('combobox', { name: 'State: Configuration & patching' });
+    expect(within(configState).getByRole('option', { name: 'N/A' })).toBeDisabled();
+    await user.click(screen.getByRole('button', { name: 'Vendor participates' }));
+    await user.click(screen.getByRole('button', { name: 'Vendor does not participate' }));
+    expect(handlers.onResolveVendor).toHaveBeenNthCalledWith(1, 'sys-1', 'config', true);
+    expect(handlers.onResolveVendor).toHaveBeenNthCalledWith(2, 'sys-1', 'config', false);
+    expect(screen.getByText('14 days.')).toBeInTheDocument();
+  });
+
+  it('shows pending review messages with provenance and marks the row reviewed', async () => {
+    const user = userEvent.setup();
+    const handlers = createHandlers();
+    const system = {
+      ...createSystem(1, SYSTEM_TEMPLATES[0]),
+      reviewFlags: { categoriesBroadened: 'pending', monitoringUnconfirmed: 'cleared' } as MatrixSystem['reviewFlags'],
+      provenance: { loggingResponse: ['v', 'm'] as MatrixSystem['cells']['data']['parties'] },
+    };
+    const { rerender } = render(<SystemList systems={[system]} {...handlers} />);
+    expect(screen.getByText(/Category definitions changed/)).toBeInTheDocument();
+    expect(screen.queryByText(/Monitoring was suggested/)).not.toBeInTheDocument();
+    expect(screen.getByText(/Originally saved as Logging & response: V M/)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Mark reviewed' }));
+    expect(handlers.onReviewed).toHaveBeenCalledWith('sys-1');
+    rerender(<SystemList systems={[{ ...system, reviewFlags: { categoriesBroadened: 'cleared' } }]} {...handlers} />);
+    expect(screen.queryByRole('button', { name: 'Mark reviewed' })).not.toBeInTheDocument();
+  });
+
+  it('prompts an assignment review after a scope edit without changing any cell', async () => {
+    const user = userEvent.setup();
+    const handlers = createHandlers();
+    render(<SystemList systems={[microsoft365]} {...handlers} />);
+    expect(screen.queryByText(/Scope changed/)).not.toBeInTheDocument();
+    fireEvent.change(screen.getByRole('textbox', { name: /Scope note/ }), { target: { value: 'Managed service excluded' } });
+    expect(screen.getByText(/Scope changed\. Review this row's assignments/)).toBeInTheDocument();
+    expect(handlers.onScopeNote).toHaveBeenCalledWith('sys-1', 'Managed service excluded');
+    expect(handlers.onToggleParty).not.toHaveBeenCalled();
+    expect(handlers.onCellState).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('button', { name: 'Dismiss' }));
+    expect(screen.queryByText(/Scope changed/)).not.toBeInTheDocument();
   });
 });
