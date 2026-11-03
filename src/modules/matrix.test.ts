@@ -11,10 +11,10 @@ describe('matrix state', () => {
     expect(SYSTEM_TEMPLATES[0].assignments.data).toEqual(['c', 'm']);
   });
 
-  it('starts custom systems with seven inapplicable categories', () => {
+  it('starts custom systems with eight unassigned categories', () => {
     expect(createSystem(1)).toMatchObject({
       id: 'sys-1', templateId: null, name: '', vendor: '', expanded: true,
-      assignments: { data: [], identity: [], endpoint: [], network: [], app: [], backup: [], logging: [] },
+      assignments: { data: [], identity: [], endpoint: [], network: [], app: [], backup: [], logging: [], incident: [] },
     });
   });
 

@@ -77,8 +77,8 @@ for (const width of [390, 768, 1000]) {
       const preview = table.locator('..');
       const headers = table.locator('.m-hcell');
       const cells = table.locator('.m-cell');
-      await expect(headers).toHaveCount(8);
-      await expect(cells).toHaveCount(7);
+      await expect(headers).toHaveCount(9);
+      await expect(cells).toHaveCount(8);
       const headerPositions = await headers.evaluateAll((elements) => (
         elements.map((element) => element.getBoundingClientRect().y)
       ));
@@ -94,13 +94,14 @@ for (const width of [390, 768, 1000]) {
       await expect.poll(() => preview.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
       await preview.evaluate((element) => { element.scrollLeft = element.scrollWidth; });
       const bounds = await preview.boundingBox();
-      const logging = await headers.last().boundingBox();
+      await expect(headers.last()).toHaveAccessibleName('Incident response support');
+      const incident = await headers.last().boundingBox();
       expect(bounds).not.toBeNull();
-      expect(logging).not.toBeNull();
-      if (!bounds || !logging) throw new Error('Matrix preview or final column is not rendered');
+      expect(incident).not.toBeNull();
+      if (!bounds || !incident) throw new Error('Matrix preview or final column is not rendered');
       expect(bounds.x + bounds.width).toBeLessThanOrEqual(width);
-      expect(logging.x).toBeGreaterThanOrEqual(bounds.x - 1);
-      expect(logging.x + logging.width).toBeLessThanOrEqual(bounds.x + bounds.width + 1);
+      expect(incident.x).toBeGreaterThanOrEqual(bounds.x - 1);
+      expect(incident.x + incident.width).toBeLessThanOrEqual(bounds.x + bounds.width + 1);
     });
   });
 }

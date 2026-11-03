@@ -11,7 +11,10 @@ describe('shared matrix URLs', () => {
       a: ['c', 'mc', '', 'v', 'mc', 'c', 'm'] }] });
     const restored = decodeHash(hash);
     expect(restored.systems[0]).toMatchObject({ name: 'LOB SaaS', vendor: 'Salesforce', templateId: 'saas' });
-    expect(restored.systems[0].assignments.app).toEqual(['m', 'c']);
+    expect(restored.systems[0].assignments).toEqual({
+      data: ['c'], identity: ['m', 'c'], endpoint: [], network: ['v'],
+      app: ['m', 'c'], backup: ['c'], logging: ['m'], incident: [],
+    });
     expect(decodeHash(encodeHash(restored))).toEqual(restored);
   });
 
@@ -35,8 +38,15 @@ describe('shared matrix URLs', () => {
     expect(restored).toEqual({ ...state, systems: [{ ...state.systems[0], expanded: false }] });
     expect(JSON.parse(decodeURIComponent(escape(atob(hash))))).toEqual({
       c: 'Café 東京', m: 'Our MSP', s: [{ n: 'Microsoft 365', v: 'Microsoft', t: 'm365',
-        a: ['cm', 'mv', '', 'v', 'mv', 'm', 'mv'] }],
+        a: ['cm', 'mv', '', 'v', 'mv', 'm', 'mv', 'mc'] }],
     });
+  });
+
+  it('preserves incident response overrides through shared URLs', () => {
+    const system = createSystem(1, SYSTEM_TEMPLATES[0]);
+    system.assignments.incident = ['v', 'c'];
+    const state = { ...createEmptyState(), systems: [system], nextId: 2 };
+    expect(decodeHash(encodeHash(state)).systems[0].assignments.incident).toEqual(['v', 'c']);
   });
 
   it.each(['', 'invalid-base64', legacyHash(null), legacyHash({ c: 42, s: 'bad' }),

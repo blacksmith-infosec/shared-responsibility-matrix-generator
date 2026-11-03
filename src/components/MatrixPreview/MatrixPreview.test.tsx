@@ -13,13 +13,24 @@ const defaultProps = {
 };
 
 describe('MatrixPreview', () => {
+  it('includes the scope of incident response support in the exported artifact', () => {
+    render(<MatrixPreview {...defaultProps} />);
+    const artifact = defaultProps.artifactRef.current;
+    expect(artifact).not.toBeNull();
+    if (!artifact) throw new Error('Matrix artifact is not rendered');
+    expect(within(artifact).getByText(
+      'Incident response support covers investigation, containment, and remediation within agreed service scope. '
+      + 'Incident leadership, escalation, and decision authority are defined in the client\'s incident response plan.',
+    )).toBeVisible();
+  });
+
   it('exposes systems, categories, and assigned parties as an accessible table', () => {
     const system = createSystem(1);
     system.name = 'Client infrastructure';
     system.vendor = 'Example vendor';
     system.assignments = {
       data: ['v'], identity: ['m'], endpoint: ['c'], network: ['c', 'v'],
-      app: ['c', 'v', 'm'], backup: [], logging: ['m', 'v'],
+      app: ['c', 'v', 'm'], backup: [], logging: ['m', 'v'], incident: ['m', 'c'],
     };
     render(<MatrixPreview {...defaultProps} systems={[system, { ...createSystem(2), name: 'Email' }]} />);
 
@@ -29,9 +40,11 @@ describe('MatrixPreview', () => {
     const rows = within(table).getAllByRole('row');
     expect(rows).toHaveLength(3);
     const columns = within(rows[0]).getAllByRole('columnheader');
-    expect(columns).toHaveLength(8);
+    expect(columns).toHaveLength(9);
     expect(columns[0]).toHaveAccessibleName('System');
     expect(columns[1]).toHaveAccessibleName('Data classification');
+    expect(columns[7]).toHaveAccessibleName('Logging & monitoring');
+    expect(columns[8]).toHaveAccessibleName('Incident response support');
     columns.forEach((column) => expect(column).toHaveAttribute('scope', 'col'));
 
     const firstSystem = within(rows[1]);
@@ -39,7 +52,9 @@ describe('MatrixPreview', () => {
     expect(rowHeader).toHaveAttribute('scope', 'row');
     expect(rowHeader).toHaveAccessibleName('Client infrastructure Example vendor');
     const cells = firstSystem.getAllByRole('cell');
-    const partyLabels = ['Vendor', 'MSP', 'Client', 'Vendor, Client', 'Vendor, MSP, Client', 'Unassigned', 'Vendor, MSP'];
+    const partyLabels = [
+      'Vendor', 'MSP', 'Client', 'Vendor, Client', 'Vendor, MSP, Client', 'Unassigned', 'Vendor, MSP', 'MSP, Client',
+    ];
     expect(cells).toHaveLength(partyLabels.length);
     cells.forEach((cell, index) => expect(cell).toHaveAccessibleName(partyLabels[index]));
     expect(within(rows[2]).getByRole('rowheader')).toHaveAccessibleName('Email');
@@ -76,8 +91,8 @@ describe('MatrixPreview', () => {
     expect(screen.queryByText('Start with a template')).not.toBeInTheDocument();
     expect(screen.getByText('Acme')).toBeInTheDocument();
     expect(screen.getByText('Example MSP')).toBeInTheDocument();
-    expect(container.querySelectorAll('.m-hcell')).toHaveLength(8);
-    expect(container.querySelectorAll('.m-cell')).toHaveLength(7);
+    expect(container.querySelectorAll('.m-hcell')).toHaveLength(9);
+    expect(container.querySelectorAll('.m-cell')).toHaveLength(8);
     const dataDots = container.querySelectorAll('.m-cell')[0].querySelectorAll('.dot');
     expect(dataDots[0]).toHaveClass('v', 'off');
     expect(dataDots[1]).toHaveClass('m', 'on');

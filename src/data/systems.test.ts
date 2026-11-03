@@ -34,7 +34,7 @@ describe('client-facing system catalog', () => {
     expect(createSystem(1, getTemplate(id))).toMatchObject({ templateId: id, name, vendor });
   });
 
-  it('keeps every template addressable with valid assignments for all seven categories', () => {
+  it('keeps every template addressable with valid assignments for all eight categories', () => {
     const ids = SYSTEM_TEMPLATES.map((template) => template.id);
     expect(new Set(ids).size).toBe(ids.length);
     for (const template of SYSTEM_TEMPLATES) {
@@ -57,6 +57,15 @@ describe('client-facing system catalog', () => {
     for (const id of ['defender', 'huntress', 'sentinelone', 'dnsfilter']) {
       expect(createSystem(1, getTemplate(id)).assignments.backup).toEqual([]);
     }
+  });
+
+  it.each([
+    { id: 'huntress', parties: ['v', 'm', 'c'] },
+    { id: 'm365', parties: ['m', 'c'] },
+    { id: 'sentinelone', parties: ['m', 'c'] },
+    { id: 'quickbooks', parties: ['c'] },
+  ])('assigns incident response support within the service scope of $id', ({ id, parties }) => {
+    expect(createSystem(1, getTemplate(id)).assignments.incident).toEqual(parties);
   });
 
   it.each(['backup', 'datto-saas', 'cove'])('includes vendor backup infrastructure for %s', (id) => {

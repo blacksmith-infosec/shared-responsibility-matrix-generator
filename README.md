@@ -13,7 +13,7 @@ Built for MSPs, vCISOs, and auditors who need a clear starting point for client 
 ## What it does
 
 - Add systems from a template or create a custom system.
-- Set the system and vendor names, then choose which parties are involved in each of seven security categories.
+- Set the system and vendor names, then choose which parties are involved in each of eight security categories.
 - Preview the matrix as you edit, with optional client details and your MSP logo.
 - Export PNG, landscape PDF, or CSV.
 - Bookmark or share the current URL to restore the matrix later.
@@ -113,7 +113,7 @@ The application follows the React, TypeScript, Vite, Vitest, and ESLint conventi
 
 ## Responsibility data
 
-The category definitions determine the seven matrix columns. The system catalog provides template names, vendor names, and default assignments. A custom system starts without assignments.
+The category definitions determine the eight matrix columns. The system catalog provides template names, vendor names, and default assignments. A custom system starts without assignments.
 
 Each assignment is an array of party codes: `v` for vendor or platform provider, `m` for MSP, and `c` for client. An empty array means no party is involved. Updates to template defaults affect newly added systems; an existing matrix retains its selected assignments.
 
@@ -153,11 +153,13 @@ The responsibility defaults are modeled starting points for a managed-client eng
 
 Windows endpoints represents the device estate. Intune and endpoint security products have separate rows for their own service scope. EDR response or rollback does not provide general device backups. Huntress's template includes its managed SOC; SentinelOne Singularity Complete's template assumes MSP incident handling alongside vendor detection technology and automation. A separately purchased MDR service can change that allocation.
 
+Logging & monitoring is separate from Incident response support. Incident response support covers investigation, containment, and remediation within agreed service scope. Incident leadership, escalation, and decision authority are defined in the client's incident response plan. Defaults assign V/M/C to Huntress's managed response service, M/C to the other IT-supported templates, and C to QuickBooks, whose application-specific response is client-coordinated. Review these assignments against contracted coverage and response authority; an unsupported application can still require containment in MSP-managed identity, endpoint, or network systems.
+
 Firewall templates assume the MSP operates the client's appliance and manages rules, firmware, configuration backups, and monitoring. SaaS data ownership, access approvals, retention choices, and recovery requirements remain client decisions. QuickBooks defaults keep accounting operations with the client; MSP participation assumes delegated access support. The 1Password recovery category covers vault and account recovery.
 
 Datto SaaS Protection is scoped to Microsoft 365 and Google Workspace. Cove's template models server, workstation, and Microsoft 365 backup; its Google Workspace offering is currently in public preview. Confirm workload coverage and restore procedures before relying on either template. Collaboration retention and service availability also need a separate recovery plan.
 
-Renamed templates keep their existing IDs. Saved URLs preserve their authored names, vendors, and responsibility overrides; catalog changes affect newly added rows.
+Renamed templates keep their existing IDs. Saved URLs preserve their authored names, vendors, and responsibility overrides; catalog changes affect newly added rows. Existing seven-category URLs leave Incident response support unassigned for review.
 
 CSV exports include System and Vendor columns followed by the responsibility categories. Assignment cells contain `V`, `M`, and `C` in that order. Formula-like system and vendor text is prefixed with an apostrophe to prevent spreadsheet execution. CSV import is not currently supported.
 

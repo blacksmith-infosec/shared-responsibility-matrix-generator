@@ -15,7 +15,8 @@ export const SYSTEM_TEMPLATES: SystemTemplate[] = [
       network:  ['v'],
       app:      ['m', 'v'],
       backup:   ['m'],
-      logging:  ['m', 'v']
+      logging:  ['m', 'v'],
+      incident: ['m', 'c'],
     }
   },
   {
@@ -29,7 +30,8 @@ export const SYSTEM_TEMPLATES: SystemTemplate[] = [
       network:  ['v'],
       app:      ['m', 'v'],
       backup:   ['v'],
-      logging:  ['m', 'v']
+      logging:  ['m', 'v'],
+      incident: ['m', 'c'],
     }
   },
   {
@@ -43,7 +45,8 @@ export const SYSTEM_TEMPLATES: SystemTemplate[] = [
       network:  ['m', 'v'],
       app:      ['m', 'c'],
       backup:   ['m', 'v'],
-      logging:  ['m', 'v']
+      logging:  ['m', 'v'],
+      incident: ['m', 'c'],
     }
   },
   {
@@ -57,7 +60,8 @@ export const SYSTEM_TEMPLATES: SystemTemplate[] = [
       network:  ['m', 'v'],
       app:      ['m', 'c'],
       backup:   ['m', 'v'],
-      logging:  ['m', 'v']
+      logging:  ['m', 'v'],
+      incident: ['m', 'c'],
     }
   },
   {
@@ -71,7 +75,8 @@ export const SYSTEM_TEMPLATES: SystemTemplate[] = [
       network:  ['v'],
       app:      ['m', 'v'],
       backup:   ['m'],
-      logging:  ['m', 'v']
+      logging:  ['m', 'v'],
+      incident: ['m', 'c'],
     }
   },
   {
@@ -86,7 +91,8 @@ export const SYSTEM_TEMPLATES: SystemTemplate[] = [
       network:  ['m'],
       app:      ['m'],
       backup:   ['m'],
-      logging:  ['m']
+      logging:  ['m'],
+      incident: ['m', 'c'],
     }
   },
   {
@@ -101,7 +107,8 @@ export const SYSTEM_TEMPLATES: SystemTemplate[] = [
       network:  ['m'],
       app:      ['m'],
       backup:   ['m'],
-      logging:  ['m']
+      logging:  ['m'],
+      incident: ['m', 'c'],
     }
   },
   {
@@ -115,7 +122,8 @@ export const SYSTEM_TEMPLATES: SystemTemplate[] = [
       network:  [],
       app:      ['m'],
       backup:   ['v', 'm'],
-      logging:  ['m']
+      logging:  ['m'],
+      incident: ['m', 'c'],
     }
   },
   {
@@ -129,7 +137,8 @@ export const SYSTEM_TEMPLATES: SystemTemplate[] = [
       network:  ['v'],
       app:      ['v', 'm', 'c'],
       backup:   ['c'],
-      logging:  ['v', 'm']
+      logging:  ['v', 'm'],
+      incident: ['m', 'c'],
     }
   },
   {
@@ -144,6 +153,7 @@ export const SYSTEM_TEMPLATES: SystemTemplate[] = [
       app: ['v', 'm'],
       backup: [],
       logging: ['v', 'm'],
+      incident: ['m', 'c'],
     },
   },
   {
@@ -158,6 +168,7 @@ export const SYSTEM_TEMPLATES: SystemTemplate[] = [
       app: ['v', 'm'],
       backup: [],
       logging: ['v', 'm'],
+      incident: ['m', 'c'],
     },
   },
   {
@@ -173,6 +184,7 @@ export const SYSTEM_TEMPLATES: SystemTemplate[] = [
       app: ['v', 'm'],
       backup: [],
       logging: ['v', 'm', 'c'],
+      incident: ['v', 'm', 'c'],
     },
   },
   {
@@ -188,6 +200,7 @@ export const SYSTEM_TEMPLATES: SystemTemplate[] = [
       app: ['v', 'm'],
       backup: [],
       logging: ['v', 'm'],
+      incident: ['m', 'c'],
     },
   },
   {
@@ -203,6 +216,7 @@ export const SYSTEM_TEMPLATES: SystemTemplate[] = [
       app: ['m'],
       backup: ['m'],
       logging: ['m'],
+      incident: ['m', 'c'],
     },
   },
   {
@@ -218,6 +232,7 @@ export const SYSTEM_TEMPLATES: SystemTemplate[] = [
       app: ['m'],
       backup: ['m'],
       logging: ['m'],
+      incident: ['m', 'c'],
     },
   },
   {
@@ -233,6 +248,7 @@ export const SYSTEM_TEMPLATES: SystemTemplate[] = [
       app: ['v', 'm'],
       backup: [],
       logging: ['v', 'm'],
+      incident: ['m', 'c'],
     },
   },
   {
@@ -248,6 +264,7 @@ export const SYSTEM_TEMPLATES: SystemTemplate[] = [
       app: ['v', 'm'],
       backup: ['v', 'm', 'c'],
       logging: ['v', 'm'],
+      incident: ['m', 'c'],
     },
   },
   {
@@ -263,6 +280,7 @@ export const SYSTEM_TEMPLATES: SystemTemplate[] = [
       app: ['v', 'm'],
       backup: ['v', 'm', 'c'],
       logging: ['v', 'm'],
+      incident: ['m', 'c'],
     },
   },
   {
@@ -278,6 +296,7 @@ export const SYSTEM_TEMPLATES: SystemTemplate[] = [
       app: ['v', 'm', 'c'],
       backup: ['m', 'c'],
       logging: ['v', 'm', 'c'],
+      incident: ['m', 'c'],
     },
   },
   {
@@ -293,6 +312,7 @@ export const SYSTEM_TEMPLATES: SystemTemplate[] = [
       app: ['v', 'c'],
       backup: ['c'],
       logging: ['v', 'c'],
+      incident: ['c'],
     },
   },
   {
@@ -307,6 +327,7 @@ export const SYSTEM_TEMPLATES: SystemTemplate[] = [
       app: ['v', 'm', 'c'],
       backup: ['m', 'c'],
       logging: ['v', 'm', 'c'],
+      incident: ['m', 'c'],
     },
   },
   {
@@ -322,6 +343,7 @@ export const SYSTEM_TEMPLATES: SystemTemplate[] = [
       app: ['v', 'm', 'c'],
       backup: ['m', 'c'],
       logging: ['v', 'm'],
+      incident: ['m', 'c'],
     },
   },
   {
@@ -337,6 +359,7 @@ export const SYSTEM_TEMPLATES: SystemTemplate[] = [
       app: ['v', 'm', 'c'],
       backup: ['m', 'c'],
       logging: ['v', 'm'],
+      incident: ['m', 'c'],
     },
   }
 ];

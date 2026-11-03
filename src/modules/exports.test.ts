@@ -8,10 +8,11 @@ describe('CSV export', () => {
     system.name = 'Mail, "Primary"';
     system.vendor = 'Line\nTwo';
     system.assignments.data = ['c', 'v', 'm'];
+    system.assignments.incident = ['m', 'c', 'v'];
     expect(createCsv([system])).toBe(
       'System,Vendor,Data classification,Identity access,Endpoint protection,Network controls,' +
-      'App security & patching,Backup recovery,Logging & response\r\n' +
-      '"Mail, ""Primary""","Line\nTwo",VMC,,,,,,',
+      'App security & patching,Backup recovery,Logging & monitoring,Incident response support\r\n' +
+      '"Mail, ""Primary""","Line\nTwo",VMC,,,,,,,VMC',
     );
   });
 
@@ -27,7 +28,7 @@ describe('CSV export', () => {
     'exports full-width spreadsheet formula prefixes as literal text: %s', (value) => {
       const system = { ...createSystem(1), name: value, vendor: value };
       const row = createCsv([system]).split('\r\n')[1];
-      expect(row).toBe(`'${value},'${value},,,,,,,`);
+      expect(row).toBe(`'${value},'${value},,,,,,,,`);
     },
   );
 
@@ -68,6 +69,7 @@ describe('CSV downloads', () => {
   it('downloads the CSV contents and filename, then releases its object URL', async () => {
     const system = { ...createSystem(1), name: 'Client email', vendor: 'Microsoft' };
     system.assignments.identity = ['m', 'v'];
+    system.assignments.incident = ['c', 'm'];
     const clickedLinks: HTMLAnchorElement[] = [];
     vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (this: HTMLAnchorElement) {
       clickedLinks.push(this);
@@ -83,8 +85,8 @@ describe('CSV downloads', () => {
     expect(blob.type).toBe('text/csv;charset=utf-8;');
     expect(await readBlobText(blob)).toBe(
       'System,Vendor,Data classification,Identity access,Endpoint protection,Network controls,' +
-      'App security & patching,Backup recovery,Logging & response\r\n' +
-      'Client email,Microsoft,,VM,,,,,',
+      'App security & patching,Backup recovery,Logging & monitoring,Incident response support\r\n' +
+      'Client email,Microsoft,,VM,,,,,,MC',
     );
     expect(revokeObjectURL).toHaveBeenCalledExactlyOnceWith('blob:matrix-download');
   });

@@ -7,5 +7,6 @@ export const CATEGORIES: Category[] = [
   { id: 'network',  main: 'Network',      sub: 'controls' },
   { id: 'app',      main: 'App security', sub: '& patching' },
   { id: 'backup',   main: 'Backup',       sub: 'recovery' },
-  { id: 'logging',  main: 'Logging',      sub: '& response' }
+  { id: 'logging',  main: 'Logging',      sub: '& monitoring' },
+  { id: 'incident', main: 'Incident',     sub: 'response support' }
 ];

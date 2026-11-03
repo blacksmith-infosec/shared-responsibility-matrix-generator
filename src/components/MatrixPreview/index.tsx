@@ -152,6 +152,11 @@ export const MatrixPreview = ({
             <span className="legend-cell-text">Not involved</span>
           </span>
           <div className="legend-note">Multiple filled dots indicate shared responsibility.</div>
+          <div className="legend-note">
+            Incident response support covers investigation, containment, and remediation within agreed service scope.
+            {' '}Incident leadership, escalation, and decision authority are defined in the client&apos;s
+            incident response plan.
+          </div>
         </div>
       </div>
     </div>

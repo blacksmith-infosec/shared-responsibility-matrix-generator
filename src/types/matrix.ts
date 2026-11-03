@@ -1,5 +1,5 @@
 export type Party = 'v' | 'm' | 'c';
-export type CategoryId = 'data' | 'identity' | 'endpoint' | 'network' | 'app' | 'backup' | 'logging';
+export type CategoryId = 'data' | 'identity' | 'endpoint' | 'network' | 'app' | 'backup' | 'logging' | 'incident';
 export type Assignments = Record<CategoryId, Party[]>;
 
 export interface Category {

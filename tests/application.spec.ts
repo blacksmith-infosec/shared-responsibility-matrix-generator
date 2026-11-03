@@ -1,72 +1,72 @@
 import { expect, test } from '@playwright/test';
 import { addTemplate, preparePage, readDownload } from './browser-helpers';
 
-const categories = ['data', 'identity', 'endpoint', 'network', 'app', 'backup', 'logging'];
+const categories = ['data', 'identity', 'endpoint', 'network', 'app', 'backup', 'logging', 'incident'];
 const templates = [
-  { id: 'm365', name: 'Microsoft 365', vendor: 'Microsoft', assignments: ['mc', 'vm', '', 'v', 'vm', 'm', 'vm'] },
-  { id: 'entra', name: 'Microsoft Entra ID', vendor: 'Microsoft', assignments: ['', 'vm', '', 'v', 'vm', 'v', 'vm'] },
-  { id: 'azure', name: 'Microsoft Azure', vendor: 'Microsoft', assignments: ['mc', 'vm', 'm', 'vm', 'mc', 'vm', 'vm'] },
-  { id: 'aws', name: 'Amazon Web Services (AWS)', vendor: 'Amazon Web Services', assignments: ['mc', 'vm', 'm', 'vm', 'mc', 'vm', 'vm'] },
-  { id: 'gworkspace', name: 'Google Workspace', vendor: 'Google', assignments: ['mc', 'vm', '', 'v', 'vm', 'm', 'vm'] },
-  { id: 'endpoints', name: 'Windows endpoints', vendor: 'Microsoft', assignments: ['mc', 'm', 'm', 'm', 'm', 'm', 'm'] },
-  { id: 'network', name: 'Fortinet FortiGate', vendor: 'Fortinet', assignments: ['', 'm', '', 'm', 'm', 'm', 'm'] },
-  { id: 'backup', name: 'Datto SIRIS', vendor: 'Datto', assignments: ['mc', 'm', '', '', 'm', 'vm', 'm'] },
-  { id: 'saas', name: 'Salesforce Starter Suite', vendor: 'Salesforce', assignments: ['c', 'mc', '', 'v', 'vmc', 'c', 'vm'] },
+  { id: 'm365', name: 'Microsoft 365', vendor: 'Microsoft', assignments: ['mc', 'vm', '', 'v', 'vm', 'm', 'vm', 'mc'] },
+  { id: 'entra', name: 'Microsoft Entra ID', vendor: 'Microsoft', assignments: ['', 'vm', '', 'v', 'vm', 'v', 'vm', 'mc'] },
+  { id: 'azure', name: 'Microsoft Azure', vendor: 'Microsoft', assignments: ['mc', 'vm', 'm', 'vm', 'mc', 'vm', 'vm', 'mc'] },
+  { id: 'aws', name: 'Amazon Web Services (AWS)', vendor: 'Amazon Web Services', assignments: ['mc', 'vm', 'm', 'vm', 'mc', 'vm', 'vm', 'mc'] },
+  { id: 'gworkspace', name: 'Google Workspace', vendor: 'Google', assignments: ['mc', 'vm', '', 'v', 'vm', 'm', 'vm', 'mc'] },
+  { id: 'endpoints', name: 'Windows endpoints', vendor: 'Microsoft', assignments: ['mc', 'm', 'm', 'm', 'm', 'm', 'm', 'mc'] },
+  { id: 'network', name: 'Fortinet FortiGate', vendor: 'Fortinet', assignments: ['', 'm', '', 'm', 'm', 'm', 'm', 'mc'] },
+  { id: 'backup', name: 'Datto SIRIS', vendor: 'Datto', assignments: ['mc', 'm', '', '', 'm', 'vm', 'm', 'mc'] },
+  { id: 'saas', name: 'Salesforce Starter Suite', vendor: 'Salesforce', assignments: ['c', 'mc', '', 'v', 'vmc', 'c', 'vm', 'mc'] },
   {
     id: 'intune', name: 'Microsoft Intune', vendor: 'Microsoft',
-    assignments: ['mc', 'vmc', 'vm', 'v', 'vm', '', 'vm'],
+    assignments: ['mc', 'vmc', 'vm', 'v', 'vm', '', 'vm', 'mc'],
   },
   {
     id: 'defender', name: 'Microsoft Defender for Business', vendor: 'Microsoft',
-    assignments: ['mc', 'vmc', 'vm', 'v', 'vm', '', 'vm'],
+    assignments: ['mc', 'vmc', 'vm', 'v', 'vm', '', 'vm', 'mc'],
   },
   {
     id: 'huntress', name: 'Huntress Managed EDR', vendor: 'Huntress',
-    assignments: ['mc', 'vmc', 'vm', 'v', 'vm', '', 'vmc'],
+    assignments: ['mc', 'vmc', 'vm', 'v', 'vm', '', 'vmc', 'vmc'],
   },
   {
     id: 'sentinelone', name: 'SentinelOne Singularity Complete', vendor: 'SentinelOne',
-    assignments: ['mc', 'vmc', 'vm', 'v', 'vm', '', 'vm'],
+    assignments: ['mc', 'vmc', 'vm', 'v', 'vm', '', 'vm', 'mc'],
   },
   {
     id: 'sonicwall', name: 'SonicWall TZ Series', vendor: 'SonicWall',
-    assignments: ['', 'm', '', 'm', 'm', 'm', 'm'],
+    assignments: ['', 'm', '', 'm', 'm', 'm', 'm', 'mc'],
   },
   {
     id: 'unifi', name: 'UniFi Cloud Gateway', vendor: 'Ubiquiti',
-    assignments: ['', 'm', '', 'm', 'm', 'm', 'm'],
+    assignments: ['', 'm', '', 'm', 'm', 'm', 'm', 'mc'],
   },
   {
     id: 'dnsfilter', name: 'DNSFilter', vendor: 'DNSFilter',
-    assignments: ['', 'mc', '', 'vmc', 'vm', '', 'vm'],
+    assignments: ['', 'mc', '', 'vmc', 'vm', '', 'vm', 'mc'],
   },
   {
     id: 'datto-saas', name: 'Datto SaaS Protection', vendor: 'Datto',
-    assignments: ['mc', 'vmc', '', 'v', 'vm', 'vmc', 'vm'],
+    assignments: ['mc', 'vmc', '', 'v', 'vm', 'vmc', 'vm', 'mc'],
   },
   {
     id: 'cove', name: 'Cove Data Protection', vendor: 'N-able',
-    assignments: ['mc', 'vmc', '', 'v', 'vm', 'vmc', 'vm'],
+    assignments: ['mc', 'vmc', '', 'v', 'vm', 'vmc', 'vm', 'mc'],
   },
   {
     id: '1password', name: '1Password Business', vendor: '1Password',
-    assignments: ['c', 'vmc', '', 'v', 'vmc', 'mc', 'vmc'],
+    assignments: ['c', 'vmc', '', 'v', 'vmc', 'mc', 'vmc', 'mc'],
   },
   {
     id: 'quickbooks', name: 'QuickBooks Online', vendor: 'Intuit',
-    assignments: ['c', 'mc', '', 'v', 'vc', 'c', 'vc'],
+    assignments: ['c', 'mc', '', 'v', 'vc', 'c', 'vc', 'c'],
   },
   {
     id: 'hubspot', name: 'HubSpot Smart CRM', vendor: 'HubSpot',
-    assignments: ['c', 'mc', '', 'v', 'vmc', 'mc', 'vmc'],
+    assignments: ['c', 'mc', '', 'v', 'vmc', 'mc', 'vmc', 'mc'],
   },
   {
     id: 'slack', name: 'Slack', vendor: 'Slack',
-    assignments: ['mc', 'mc', '', 'v', 'vmc', 'mc', 'vm'],
+    assignments: ['mc', 'mc', '', 'v', 'vmc', 'mc', 'vm', 'mc'],
   },
   {
     id: 'zoom', name: 'Zoom Workplace', vendor: 'Zoom',
-    assignments: ['mc', 'mc', '', 'v', 'vmc', 'mc', 'vm'],
+    assignments: ['mc', 'mc', '', 'v', 'vmc', 'mc', 'vm', 'mc'],
   },
 ];
 
@@ -103,6 +103,8 @@ test('updates client branding immediately and restores Unicode from a bookmarked
   await card.locator('.js-vendor').fill('Équipe "Cloud"');
   await card.locator('[data-cat="data"][data-party="m"]').click();
   await card.locator('[data-cat="data"][data-party="c"]').click();
+  await card.locator('[data-cat="incident"][data-party="c"]').click();
+  await card.locator('[data-cat="incident"][data-party="v"]').click();
   await expect.poll(() => new URL(page.url()).hash).not.toBe('');
   await expect.poll(async () => {
     const hash = new URL(page.url()).hash.slice(1);
@@ -110,7 +112,7 @@ test('updates client branding immediately and restores Unicode from a bookmarked
   }).toMatchObject({
     n: 'Système 数据',
     v: 'Équipe "Cloud"',
-    a: ['mc', '', '', '', '', '', ''],
+    a: ['mc', '', '', '', '', '', '', 'cv'],
   });
   await page.reload();
   await expect(page.locator('#customer')).toHaveValue('München 客户 🔒');
@@ -121,6 +123,9 @@ test('updates client branding immediately and restores Unicode from a bookmarked
   await card.locator('.card-head').click();
   await expect(card.locator('[data-cat="data"][data-party="m"]')).toHaveClass(/on/);
   await expect(card.locator('[data-cat="data"][data-party="c"]')).toHaveClass(/on/);
+  await expect(card.locator('[data-cat="incident"][data-party="v"]')).toHaveClass(/on/);
+  await expect(card.locator('[data-cat="incident"][data-party="c"]')).toHaveClass(/on/);
+  await expect(card.locator('[data-cat="incident"][data-party="m"]')).not.toHaveClass(/on/);
 });
 
 test('preserves bookmarked matrix names and assignments when their templates are renamed', async ({ page }) => {
@@ -144,6 +149,11 @@ test('preserves bookmarked matrix names and assignments when their templates are
   await card.locator('.card-toggle').click();
   await expect(card.locator('[data-cat="endpoint"][data-party="m"]')).toHaveClass(/on/);
   await expect(card.locator('[data-cat="endpoint"][data-party="v"]')).not.toHaveClass(/on/);
+  await expect(card.locator('[data-cat="logging"][data-party="m"]')).toHaveClass(/on/);
+  for (const party of ['v', 'm', 'c']) {
+    await expect(card.locator(`[data-cat="incident"][data-party="${party}"]`)).not.toHaveClass(/on/);
+  }
+  await expect(page.locator('#matrix .m-cell').last()).toHaveAccessibleName('Unassigned');
   await page.locator('#add-system-btn').click();
   await expect(page.locator('#add-menu [data-tpl="endpoints"]')).toHaveCount(0);
   await page.locator('#add-system-btn').click();
@@ -218,7 +228,7 @@ test('adds, edits, collapses, and removes a custom system with shared responsibi
   await expect(card).toHaveClass(/expanded/);
   await expect(card.locator('.card-name-display')).toHaveText('Untitled system');
   await expect(page.locator('#system-count')).toHaveText('1 system');
-  await expect(page.locator('#matrix .na')).toHaveCount(7);
+  await expect(page.locator('#matrix .na')).toHaveCount(8);
   await card.locator('.js-name').fill('CRM & "Sales" <suite>');
   await card.locator('.js-vendor').fill('Example, Inc.');
   await expect(page.locator('#matrix .m-rlabel')).toContainText('CRM & "Sales" <suite>');
@@ -311,13 +321,15 @@ test('downloads correctly quoted CSV and valid PNG and PDF files', async ({ page
   for (const party of ['c', 'v', 'm']) {
     await card.locator(`[data-cat="data"][data-party="${party}"]`).click();
   }
+  await card.locator('[data-cat="incident"][data-party="c"]').click();
+  await card.locator('[data-cat="incident"][data-party="m"]').click();
   const csvPromise = page.waitForEvent('download');
   await page.locator('#download-csv').click();
   const csv = await csvPromise;
   expect(csv.suggestedFilename()).toBe('srm-example-partners.csv');
   expect((await readDownload(csv)).toString('utf8')).toBe(
-    'System,Vendor,Data classification,Identity access,Endpoint protection,Network controls,App security & patching,Backup recovery,Logging & response\r\n'
-    + '"CRM, ""Sales""","Example, Inc.",VMC,,,,,,',
+    'System,Vendor,Data classification,Identity access,Endpoint protection,Network controls,App security & patching,Backup recovery,Logging & monitoring,Incident response support\r\n'
+    + '"CRM, ""Sales""","Example, Inc.",VMC,,,,,,,MC',
   );
 
   const pngPromise = page.waitForEvent('download');
@@ -356,6 +368,6 @@ test('exports shared-link system names and vendors as text instead of spreadshee
   const downloadPromise = page.waitForEvent('download');
   await page.locator('#download-csv').click();
   const csv = (await readDownload(await downloadPromise)).toString('utf8');
-  expect(csv.split('\r\n')[1]).toBe("'=1+1,'+1+1,,,,,,,");
+  expect(csv.split('\r\n')[1]).toBe("'=1+1,'+1+1,,,,,,,,");
 });
 
