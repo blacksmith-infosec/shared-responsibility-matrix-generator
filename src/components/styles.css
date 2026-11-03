@@ -847,10 +847,9 @@ a { color: inherit; text-decoration: none; }
   :root:not([data-theme="light"]) .btn:not(.btn-secondary) { color: #231F20; }
 }
 
-/* Preview-pane disclaimer (relocated from form hero in v0.8).
-   Sits below the toolbar and above the artifact so it reads as
-   guidance about the exported deliverable. */
-.output-disclaimer {
+/* Keep preview guidance above the artifact and outside exported images. */
+.output-disclaimer,
+.output-privacy {
   width: 100%;
   max-width: 920px;
   font-size: 11.5px;
@@ -859,6 +858,11 @@ a { color: inherit; text-decoration: none; }
   line-height: 1.5;
   color: var(--text-faint);
   margin: 0 0 var(--space-4);
+}
+
+.output-privacy {
+  font-style: normal;
+  color: var(--text-muted);
 }
 
 /* =================================================================

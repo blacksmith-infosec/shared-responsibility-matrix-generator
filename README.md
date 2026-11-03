@@ -188,6 +188,8 @@ CSV exports include System and Vendor columns followed by the responsibility cat
 
 ## Privacy and saved matrices
 
+Your matrix is saved in this page's link. Anyone with the full link can read it, including client names. Share it only with people who should see it.
+
 There is no application backend. Client and MSP names, system names, vendors, and assignments are encoded in the URL fragment. Anyone with the complete URL can read and restore those values. Encoding is not encryption, so treat shared URLs and exported files as client information.
 
 The uploaded MSP logo and theme preference are stored separately in this browser's localStorage. The logo is not included in a shared URL. Remove it with the logo's remove control or clear the site's browser storage.

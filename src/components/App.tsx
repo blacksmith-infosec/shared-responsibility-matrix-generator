@@ -111,6 +111,10 @@ const MatrixEditor = () => {
               onClick={() => handleExport('csv')}>CSV</button>
           </div>
         </div>
+        <p className="output-privacy">
+          Your matrix is saved in this page&apos;s link. Anyone with the full link can read it, including client names.
+          {' '}Share it only with people who should see it.
+        </p>
         <p className="output-disclaimer">
           This is a planning aid. Confirm specific responsibility splits in your managed services agreement before
           treating them as binding.
