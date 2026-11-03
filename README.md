@@ -113,51 +113,74 @@ The application follows the React, TypeScript, Vite, Vitest, and ESLint conventi
 
 ## Responsibility data
 
-The category definitions determine the eight matrix columns. The system catalog provides template names, vendor names, and default assignments. A custom system starts without assignments.
+The matrix has eight responsibility columns plus System, for nine displayed columns. The vendor appears beneath the system name. CSV exports separate System and Vendor, for ten columns. The category definitions determine the responsibility columns; the system catalog provides template names, vendor names, and default assignments. A custom system starts without assignments.
 
-Each assignment is an array of party codes: `v` for vendor or platform provider, `m` for MSP, and `c` for client. An empty array means no party is involved. Updates to template defaults affect newly added systems; an existing matrix retains its selected assignments.
+Each assignment is an array of party codes: `v` for vendor or platform provider, `m` for MSP, and `c` for client. An empty array means no party is assigned. Updates to template defaults affect newly added systems; an existing matrix retains its selected assignments.
 
 When proposing a template change, include the vendor's authoritative documentation and explain which responsibilities belong to the platform, the tenant, and the MSP. Avoid treating a vendor's platform security as ownership of tenant configuration or client data governance.
 
+### Column definitions
+
+| Responsibility column | Definition |
+| --- | --- |
+| Data classification | Identify data sensitivity, ownership, permitted use, handling, and retention requirements. |
+| Identity access | Manage accounts, authentication policies, permissions, access approvals, and access reviews. |
+| Endpoint protection | Configure and operate protection for client devices and guest operating systems, including malware prevention and endpoint detection. |
+| Network controls | Configure and operate network security within the row's scope, including platform networks, client firewalls, segmentation, and DNS filtering. |
+| App security & patching | Maintain the service or application, configure its security settings, and manage applicable software and firmware updates. |
+| Backup recovery | Define recovery requirements, configure and operate applicable recovery mechanisms, verify recoverability, and perform restores within the row's scope. |
+| Logging & monitoring | Generate, configure, retain, and review security logs and alerts. |
+| Incident response support | Investigate, contain, and remediate incidents within agreed service scope. |
+
 ### Catalog and product references
 
-The catalog focuses on client-facing systems in SMB environments. Product names and capabilities were checked against these official references on October 14, 2026.
+The catalog focuses on client-facing systems in SMB environments. Product names and capabilities were checked against these official references on October 14, 2026. The Scope column states the licensing, configuration, and service assumptions behind each template's default dots.
 
 | Template | Vendor | Scope |
 | --- | --- | --- |
-| [Microsoft 365](https://www.microsoft.com/en-us/microsoft-365/business) | Microsoft | Productivity tenant |
-| [Microsoft Entra ID](https://www.microsoft.com/en-us/security/business/identity-access/microsoft-entra-id) | Microsoft | Identity and access |
-| [Microsoft Azure](https://azure.microsoft.com/en-us) | Microsoft | Client cloud workloads |
-| [Amazon Web Services (AWS)](https://aws.amazon.com/) | Amazon Web Services | Client cloud workloads |
-| [Google Workspace](https://workspace.google.com/) | Google | Productivity tenant |
-| [Windows endpoints](https://www.microsoft.com/en-us/windows/business/) | Microsoft | Managed client devices |
-| [Fortinet FortiGate](https://www.fortinet.com/products/next-generation-firewall) | Fortinet | Local firewall |
-| [Datto SIRIS](https://www.datto.com/products/siris/) | Datto | Backup and disaster recovery |
-| [Salesforce Starter Suite](https://www.salesforce.com/small-business/starter/) | Salesforce | Small-business CRM |
-| [Microsoft Intune](https://learn.microsoft.com/en-us/intune/fundamentals/what-is-intune) | Microsoft | Device and application management |
-| [Microsoft Defender for Business](https://learn.microsoft.com/en-us/defender-business/mdb-overview) | Microsoft | Endpoint security |
-| [Huntress Managed EDR](https://www.huntress.com/platform/managed-edr) | Huntress | Managed endpoint detection and response |
-| [SentinelOne Singularity Complete](https://www.sentinelone.com/platform/singularity-complete/) | SentinelOne | Endpoint protection and EDR |
-| [SonicWall TZ Series](https://www.sonicwall.com/products/firewalls/entry-level) | SonicWall | Local firewall |
-| [UniFi Cloud Gateway](https://ui.com/cloud-gateways) | Ubiquiti | Gateway and local network management |
-| [DNSFilter](https://www.dnsfilter.com/use-case/protective-dns) | DNSFilter | Protective DNS |
-| [Datto SaaS Protection](https://www.datto.com/products/saas-protection/) | Datto | Microsoft 365 and Google Workspace backup |
-| [Cove Data Protection](https://www.n-able.com/products/cove-data-protection) | N-able | Server, workstation, and Microsoft 365 backup |
-| [1Password Business](https://support.1password.com/explore/business/) | 1Password | Business vaults and credential management |
-| [QuickBooks Online](https://quickbooks.intuit.com/online/) | Intuit | Cloud accounting |
-| [HubSpot Smart CRM](https://www.hubspot.com/products/crm/ai-crm) | HubSpot | Customer relationship management |
-| [Slack](https://slack.com/trust/security) | Slack | Team collaboration |
-| [Zoom Workplace](https://www.zoom.com/en/products/collaboration-tools/) | Zoom | Meetings and collaboration |
+| [Microsoft 365](https://www.microsoft.com/en-us/microsoft-365/business) | Microsoft | Business Premium; Microsoft-managed keys; no Microsoft 365 Backup |
+| [Microsoft Entra ID](https://www.microsoft.com/en-us/security/business/identity-access/microsoft-entra-id) | Microsoft | P1 with security defaults; no P2 risk policies |
+| [Microsoft Azure](https://azure.microsoft.com/en-us) | Microsoft | VMs and platform services; platform-managed keys; no backup service selected |
+| [Amazon Web Services (AWS)](https://aws.amazon.com/) | Amazon Web Services | EC2, VPC, S3; CloudTrail event history; no AWS Backup or GuardDuty |
+| [Google Workspace](https://workspace.google.com/) | Google | Business Plus with Vault; no third-party backup |
+| [Windows endpoints](https://www.microsoft.com/en-us/windows/business/) | Microsoft | Windows 11 Pro or Enterprise, Entra-joined, Intune-managed, Autopatch |
+| [Fortinet FortiGate](https://www.fortinet.com/products/next-generation-firewall) | Fortinet | FortiOS 7.4 administered locally; FortiGuard web filtering |
+| [Datto SIRIS](https://www.datto.com/products/siris/) | Datto | Appliance with Datto Cloud replication; screenshot verification on |
+| [Salesforce Starter Suite](https://www.salesforce.com/small-business/starter/) | Salesforce | Native sign-in; no Backup and Recover add-on |
+| [Microsoft Intune](https://learn.microsoft.com/en-us/intune/fundamentals/what-is-intune) | Microsoft | Plan 1 |
+| [Microsoft Defender for Business](https://learn.microsoft.com/en-us/defender-business/mdb-overview) | Microsoft | Default policies; web content filtering enabled |
+| [Huntress Managed EDR](https://www.huntress.com/platform/managed-edr) | Huntress | Managed EDR with Managed Microsoft Defender |
+| [SentinelOne Singularity Complete](https://www.sentinelone.com/platform/singularity-complete/) | SentinelOne | Vendor-hosted console; no Vigilance or MDR |
+| [SonicWall TZ Series](https://www.sonicwall.com/products/firewalls/entry-level) | SonicWall | SonicOS 7 administered locally; Capture ATP on |
+| [UniFi Cloud Gateway](https://ui.com/cloud-gateways) | Ubiquiti | Site Manager remote management; cloud backups on |
+| [DNSFilter](https://www.dnsfilter.com/use-case/protective-dns) | DNSFilter | MSP-managed dashboard and Roaming Clients |
+| [Datto SaaS Protection](https://www.datto.com/products/saas-protection/) | Datto | Backs up Microsoft 365 and Google Workspace |
+| [Cove Data Protection](https://www.n-able.com/products/cove-data-protection) | N-able | Servers, workstations, Microsoft 365; Fortified Copies on |
+| [1Password Business](https://support.1password.com/explore/business/) | 1Password | Bought through the 1Password MSP program |
+| [QuickBooks Online](https://quickbooks.intuit.com/online/) | Intuit | Plus or Essentials; MSP administers access only |
+| [HubSpot Smart CRM](https://www.hubspot.com/products/crm/ai-crm) | HubSpot | Starter or Professional seats |
+| [Slack](https://slack.com/trust/security) | Slack | Pro or Business+; default retention |
+| [Zoom Workplace](https://www.zoom.com/en/products/collaboration-tools/) | Zoom | Pro or Business; cloud recording with Trash on |
+
+### Boundary rules
 
 The responsibility defaults are modeled starting points for a managed-client engagement. The vendor references establish product scope; the actual V/M/C split depends on the client's agreement, licensed features, and delegated access. Azure and AWS defaults assume MSP-managed workloads and need review for the specific services deployed.
 
-Windows endpoints represents the device estate. Intune and endpoint security products have separate rows for their own service scope. EDR response or rollback does not provide general device backups. Huntress's template includes its managed SOC; SentinelOne Singularity Complete's template assumes MSP incident handling alongside vendor detection technology and automation. A separately purchased MDR service can change that allocation.
+Read each dot within the named row's scope. A filled dot indicates involvement, not that a control is configured, effective, or contractually guaranteed. Shared dots still need agreed ownership of specific tasks. An empty cell is unassigned and needs review; it does not establish that a control is unnecessary or not applicable.
 
-Logging & monitoring is separate from Incident response support. Incident response support covers investigation, containment, and remediation within agreed service scope. Incident leadership, escalation, and decision authority are defined in the client's incident response plan. Defaults assign V/M/C to Huntress's managed response service, M/C to the other IT-supported templates, and C to QuickBooks, whose application-specific response is client-coordinated. Review these assignments against contracted coverage and response authority; an unsupported application can still require containment in MSP-managed identity, endpoint, or network systems.
+Vendor participation covers platform security and explicitly contracted managed security services. Tenant configuration, user access, data governance, and security settings remain with the client or MSP unless explicitly delegated. A vendor dot under Network controls can cover the provider's service network or a delivered filtering service; it does not by itself assign operation of the client's firewall or local network.
+
+Windows endpoints represents the device estate. Intune, endpoint security, DNS filtering, and backup products have separate rows for their own service scope; those rows do not imply complete device management. The backup rows cover recovery rather than endpoint threat protection, and EDR response or rollback does not provide general device backups. Huntress's template includes its managed SOC; SentinelOne Singularity Complete's template assumes MSP incident handling alongside vendor detection technology and automation. A separately purchased MDR service can change that allocation.
+
+Logging & monitoring is separate from Incident response support. Generating logs or automated alerts does not imply staffed incident handling. Incident response support covers investigation, containment, and remediation within agreed service scope. Incident leadership, escalation, and decision authority are defined in the client's incident response plan. Defaults assign V/M/C to Huntress's managed response service, M/C to the other IT-supported templates, and C to QuickBooks, whose application-specific response is client-coordinated. Review these assignments against contracted coverage and response authority; an unsupported application can still require containment in MSP-managed identity, endpoint, or network systems.
 
 Firewall templates assume the MSP operates the client's appliance and manages rules, firmware, configuration backups, and monitoring. SaaS data ownership, access approvals, retention choices, and recovery requirements remain client decisions. QuickBooks defaults keep accounting operations with the client; MSP participation assumes delegated access support. The 1Password recovery category covers vault and account recovery.
 
+Backup recovery applies to the row's data, workloads, configuration, or account access. A dot can assign responsibility for selecting and configuring a recovery approach even when no backup service is selected; it does not establish that a licensed, configured, and tested backup exists. Platform resilience, retention, and recovery features must be assessed separately against the client's recovery requirements.
+
 Datto SaaS Protection is scoped to Microsoft 365 and Google Workspace. Cove's template models server, workstation, and Microsoft 365 backup; its Google Workspace offering is currently in public preview. Confirm workload coverage and restore procedures before relying on either template. Collaboration retention and service availability also need a separate recovery plan.
+
+### Saved matrices and CSV exports
 
 Renamed templates keep their existing IDs. Saved URLs preserve their authored names, vendors, and responsibility overrides; catalog changes affect newly added rows. Existing seven-category URLs leave Incident response support unassigned for review.
 
