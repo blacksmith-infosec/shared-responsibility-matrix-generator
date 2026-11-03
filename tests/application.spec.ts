@@ -3,70 +3,70 @@ import { addTemplate, preparePage, readDownload } from './browser-helpers';
 
 const categories = ['data', 'identity', 'endpoint', 'network', 'app', 'backup', 'logging', 'incident'];
 const templates = [
-  { id: 'm365', name: 'Microsoft 365', vendor: 'Microsoft', assignments: ['mc', 'vm', '', 'v', 'vm', 'm', 'vm', 'mc'] },
-  { id: 'entra', name: 'Microsoft Entra ID', vendor: 'Microsoft', assignments: ['', 'vm', '', 'v', 'vm', 'v', 'vm', 'mc'] },
-  { id: 'azure', name: 'Microsoft Azure', vendor: 'Microsoft', assignments: ['mc', 'vm', 'm', 'vm', 'mc', 'vm', 'vm', 'mc'] },
-  { id: 'aws', name: 'Amazon Web Services (AWS)', vendor: 'Amazon Web Services', assignments: ['mc', 'vm', 'm', 'vm', 'mc', 'vm', 'vm', 'mc'] },
-  { id: 'gworkspace', name: 'Google Workspace', vendor: 'Google', assignments: ['mc', 'vm', '', 'v', 'vm', 'm', 'vm', 'mc'] },
-  { id: 'endpoints', name: 'Windows endpoints', vendor: 'Microsoft', assignments: ['mc', 'm', 'm', 'm', 'm', 'm', 'm', 'mc'] },
-  { id: 'network', name: 'Fortinet FortiGate', vendor: 'Fortinet', assignments: ['', 'm', '', 'm', 'm', 'm', 'm', 'mc'] },
-  { id: 'backup', name: 'Datto SIRIS', vendor: 'Datto', assignments: ['mc', 'm', '', '', 'm', 'vm', 'm', 'mc'] },
-  { id: 'saas', name: 'Salesforce Starter Suite', vendor: 'Salesforce', assignments: ['c', 'mc', '', 'v', 'vmc', 'c', 'vm', 'mc'] },
+  { id: 'm365', name: 'Microsoft 365', vendor: 'Microsoft', assignments: ['vmc', 'mc', '', 'vm', 'vm', 'vmc', 'vm', 'mc'] },
+  { id: 'entra', name: 'Microsoft Entra ID', vendor: 'Microsoft', assignments: ['vmc', 'vmc', '', 'v', 'vm', 'vmc', 'vm', 'mc'] },
+  { id: 'azure', name: 'Microsoft Azure', vendor: 'Microsoft', assignments: ['vmc', 'mc', 'm', 'vm', 'vm', 'c', 'vm', 'mc'] },
+  { id: 'aws', name: 'Amazon Web Services (AWS)', vendor: 'Amazon Web Services', assignments: ['vmc', 'vmc', 'm', 'vm', 'vm', 'c', 'vm', 'mc'] },
+  { id: 'gworkspace', name: 'Google Workspace', vendor: 'Google', assignments: ['vmc', 'vmc', '', 'vm', 'vm', 'vmc', 'vm', 'mc'] },
+  { id: 'endpoints', name: 'Windows endpoints', vendor: 'Microsoft', assignments: ['mc', 'mc', 'm', '', 'vm', 'vmc', 'm', 'mc'] },
+  { id: 'network', name: 'Fortinet FortiGate', vendor: 'Fortinet', assignments: ['vm', 'mc', '', 'vm', 'm', 'm', 'm', 'mc'] },
+  { id: 'backup', name: 'Datto SIRIS', vendor: 'Datto', assignments: ['vm', 'vm', '', 'vm', 'vm', 'vmc', 'm', 'mc'] },
+  { id: 'saas', name: 'Salesforce Starter Suite', vendor: 'Salesforce', assignments: ['vmc', 'vmc', '', 'vm', 'vm', 'vmc', 'm', 'mc'] },
   {
     id: 'intune', name: 'Microsoft Intune', vendor: 'Microsoft',
-    assignments: ['mc', 'vmc', 'vm', 'v', 'vm', '', 'vm', 'mc'],
+    assignments: ['vmc', 'mc', 'vm', 'vm', 'vm', 'm', 'vm', 'mc'],
   },
   {
     id: 'defender', name: 'Microsoft Defender for Business', vendor: 'Microsoft',
-    assignments: ['mc', 'vmc', 'vm', 'v', 'vm', '', 'vm', 'mc'],
+    assignments: ['vmc', 'mc', 'vm', 'vm', 'vm', '', 'vm', 'vmc'],
   },
   {
     id: 'huntress', name: 'Huntress Managed EDR', vendor: 'Huntress',
-    assignments: ['mc', 'vmc', 'vm', 'v', 'vm', '', 'vmc', 'vmc'],
+    assignments: ['vm', 'vm', 'vm', 'v', 'vm', '', 'vm', 'vmc'],
   },
   {
     id: 'sentinelone', name: 'SentinelOne Singularity Complete', vendor: 'SentinelOne',
-    assignments: ['mc', 'vmc', 'vm', 'v', 'vm', '', 'vm', 'mc'],
+    assignments: ['vm', 'vm', 'm', 'v', 'vm', 'm', 'vm', 'mc'],
   },
   {
     id: 'sonicwall', name: 'SonicWall TZ Series', vendor: 'SonicWall',
-    assignments: ['', 'm', '', 'm', 'm', 'm', 'm', 'mc'],
+    assignments: ['vm', 'mc', '', 'vm', 'm', 'm', 'm', 'mc'],
   },
   {
     id: 'unifi', name: 'UniFi Cloud Gateway', vendor: 'Ubiquiti',
-    assignments: ['', 'm', '', 'm', 'm', 'm', 'm', 'mc'],
+    assignments: ['vm', 'vmc', '', 'm', 'm', 'vm', 'm', 'mc'],
   },
   {
     id: 'dnsfilter', name: 'DNSFilter', vendor: 'DNSFilter',
-    assignments: ['', 'mc', '', 'vmc', 'vm', '', 'vm', 'mc'],
+    assignments: ['vm', 'vm', '', 'vmc', 'vm', 'm', 'vm', 'mc'],
   },
   {
     id: 'datto-saas', name: 'Datto SaaS Protection', vendor: 'Datto',
-    assignments: ['mc', 'vmc', '', 'v', 'vm', 'vmc', 'vm', 'mc'],
+    assignments: ['vm', 'vm', '', 'v', 'vm', 'vmc', 'vm', 'mc'],
   },
   {
     id: 'cove', name: 'Cove Data Protection', vendor: 'N-able',
-    assignments: ['mc', 'vmc', '', 'v', 'vm', 'vmc', 'vm', 'mc'],
+    assignments: ['vm', 'vm', '', 'vm', 'vm', 'vmc', 'vm', 'mc'],
   },
   {
     id: '1password', name: '1Password Business', vendor: '1Password',
-    assignments: ['c', 'vmc', '', 'v', 'vmc', 'mc', 'vmc', 'mc'],
+    assignments: ['vmc', 'vmc', '', 'v', 'v', 'vmc', 'vm', 'mc'],
   },
   {
     id: 'quickbooks', name: 'QuickBooks Online', vendor: 'Intuit',
-    assignments: ['c', 'mc', '', 'v', 'vc', 'c', 'vc', 'c'],
+    assignments: ['vc', 'vmc', '', 'v', '', 'c', 'vc', 'c'],
   },
   {
     id: 'hubspot', name: 'HubSpot Smart CRM', vendor: 'HubSpot',
-    assignments: ['c', 'mc', '', 'v', 'vmc', 'mc', 'vmc', 'mc'],
+    assignments: ['vmc', 'vmc', '', 'v', 'vm', 'vmc', 'vm', 'mc'],
   },
   {
     id: 'slack', name: 'Slack', vendor: 'Slack',
-    assignments: ['mc', 'mc', '', 'v', 'vmc', 'mc', 'vm', 'mc'],
+    assignments: ['vmc', 'vmc', '', 'v', 'vm', 'c', 'vm', 'mc'],
   },
   {
     id: 'zoom', name: 'Zoom Workplace', vendor: 'Zoom',
-    assignments: ['mc', 'mc', '', 'v', 'vmc', 'mc', 'vm', 'mc'],
+    assignments: ['vmc', 'vmc', '', 'v', 'vm', 'vmc', 'vm', 'mc'],
   },
 ];
 

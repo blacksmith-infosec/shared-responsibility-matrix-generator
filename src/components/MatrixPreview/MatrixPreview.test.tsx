@@ -94,7 +94,7 @@ describe('MatrixPreview', () => {
     expect(container.querySelectorAll('.m-hcell')).toHaveLength(9);
     expect(container.querySelectorAll('.m-cell')).toHaveLength(8);
     const dataDots = container.querySelectorAll('.m-cell')[0].querySelectorAll('.dot');
-    expect(dataDots[0]).toHaveClass('v', 'off');
+    expect(dataDots[0]).toHaveClass('v', 'on');
     expect(dataDots[1]).toHaveClass('m', 'on');
     expect(dataDots[2]).toHaveClass('c', 'on');
     expect(container.querySelectorAll('.m-cell')[2]).toHaveTextContent('—');

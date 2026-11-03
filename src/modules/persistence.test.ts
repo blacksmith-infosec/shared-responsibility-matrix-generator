@@ -38,7 +38,7 @@ describe('shared matrix URLs', () => {
     expect(restored).toEqual({ ...state, systems: [{ ...state.systems[0], expanded: false }] });
     expect(JSON.parse(decodeURIComponent(escape(atob(hash))))).toEqual({
       c: 'Café 東京', m: 'Our MSP', s: [{ n: 'Microsoft 365', v: 'Microsoft', t: 'm365',
-        a: ['cm', 'mv', '', 'v', 'mv', 'm', 'mv', 'mc'] }],
+        a: ['vmc', 'mc', '', 'vm', 'mv', 'vmc', 'mv', 'mc'] }],
     });
   });
 

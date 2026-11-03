@@ -6,9 +6,9 @@ describe('matrix state', () => {
   it('creates independent editable copies of template assignments', () => {
     const first = createSystem(1, SYSTEM_TEMPLATES[0]);
     const second = createSystem(2, SYSTEM_TEMPLATES[0]);
-    first.assignments.data.push('v');
-    expect(second.assignments.data).toEqual(['c', 'm']);
-    expect(SYSTEM_TEMPLATES[0].assignments.data).toEqual(['c', 'm']);
+    first.assignments.data.pop();
+    expect(second.assignments.data).toEqual(['v', 'm', 'c']);
+    expect(SYSTEM_TEMPLATES[0].assignments.data).toEqual(['v', 'm', 'c']);
   });
 
   it('starts custom systems with eight unassigned categories', () => {
@@ -23,12 +23,12 @@ describe('matrix state', () => {
     const added = matrixReducer(initial, { type: 'add', template: SYSTEM_TEMPLATES[0] });
     const edited = matrixReducer(added, { type: 'edit', id: 'sys-1', field: 'name', value: 'Office' });
     const toggled = matrixReducer(edited, { type: 'party', id: 'sys-1', categoryId: 'data', party: 'v' });
-    expect(toggled.systems[0].assignments.data).toEqual(['c', 'm', 'v']);
+    expect(toggled.systems[0].assignments.data).toEqual(['m', 'c']);
     expect(added.systems[0].name).toBe('Microsoft 365');
-    expect(edited.systems[0].assignments.data).toEqual(['c', 'm']);
-    const removedParty = matrixReducer(toggled, { type: 'party', id: 'sys-1', categoryId: 'data', party: 'v' });
-    expect(removedParty.systems[0].assignments.data).toEqual(['c', 'm']);
-    const collapsed = matrixReducer(removedParty, { type: 'expand', id: 'sys-1' });
+    expect(edited.systems[0].assignments.data).toEqual(['v', 'm', 'c']);
+    const restoredParty = matrixReducer(toggled, { type: 'party', id: 'sys-1', categoryId: 'data', party: 'v' });
+    expect(restoredParty.systems[0].assignments.data).toEqual(['m', 'c', 'v']);
+    const collapsed = matrixReducer(restoredParty, { type: 'expand', id: 'sys-1' });
     expect(collapsed.systems[0].expanded).toBe(false);
     expect(matrixReducer(collapsed, { type: 'remove', id: 'sys-1' }).systems).toEqual([]);
     expect(initial.systems).toEqual([]);

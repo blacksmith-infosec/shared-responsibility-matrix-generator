@@ -50,17 +50,21 @@ describe('client-facing system catalog', () => {
     expect(SYSTEM_TEMPLATES.some((template) => /\b(?:RMM|PSA|Automate)\b/i.test(template.name))).toBe(false);
   });
 
-  it('includes Huntress managed response and keeps EDR separate from backup', () => {
+  it('includes Huntress managed response and distinguishes backup planning from EDR', () => {
     const huntress = createSystem(1, getTemplate('huntress'));
     expect(huntress.assignments.endpoint).toEqual(expect.arrayContaining(['v', 'm']));
     expect(huntress.assignments.logging).toEqual(expect.arrayContaining(['v', 'm']));
-    for (const id of ['defender', 'huntress', 'sentinelone', 'dnsfilter']) {
+    for (const id of ['defender', 'huntress']) {
       expect(createSystem(1, getTemplate(id)).assignments.backup).toEqual([]);
+    }
+    for (const id of ['sentinelone', 'dnsfilter']) {
+      expect(createSystem(1, getTemplate(id)).assignments.backup).toEqual(['m']);
     }
   });
 
   it.each([
     { id: 'huntress', parties: ['v', 'm', 'c'] },
+    { id: 'defender', parties: ['v', 'm', 'c'] },
     { id: 'm365', parties: ['m', 'c'] },
     { id: 'sentinelone', parties: ['m', 'c'] },
     { id: 'quickbooks', parties: ['c'] },
@@ -74,9 +78,9 @@ describe('client-facing system catalog', () => {
     expect(system.assignments.endpoint).toEqual([]);
   });
 
-  it('leaves accounting data and recovery decisions with the client', () => {
+  it('assigns accounting data to the vendor and client, and recovery to the client', () => {
     const quickbooks = createSystem(1, getTemplate('quickbooks'));
-    expect(quickbooks.assignments.data).toEqual(['c']);
+    expect(quickbooks.assignments.data).toEqual(['v', 'c']);
     expect(quickbooks.assignments.backup).toEqual(['c']);
   });
 });

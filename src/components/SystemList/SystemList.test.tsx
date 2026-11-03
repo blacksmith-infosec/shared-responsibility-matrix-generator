@@ -97,7 +97,7 @@ describe('SystemList', () => {
     const clientData = screen.getByRole('button', { name: 'Client: Data classification' });
     const vendorData = screen.getByRole('button', { name: 'Vendor: Data classification' });
     expect(clientData).toHaveAttribute('aria-pressed', 'true');
-    expect(vendorData).toHaveAttribute('aria-pressed', 'false');
+    expect(vendorData).toHaveAttribute('aria-pressed', 'true');
     await user.click(vendorData);
     expect(handlers.onToggleParty).toHaveBeenCalledWith('sys-1', 'data', 'v');
   });
