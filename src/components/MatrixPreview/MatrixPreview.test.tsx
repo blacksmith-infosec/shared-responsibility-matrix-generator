@@ -13,7 +13,7 @@ const defaultProps = {
 };
 
 describe('MatrixPreview', () => {
-  it('includes the scope of incident response support in the exported artifact', () => {
+  it('includes legend guidance in the exported artifact', () => {
     render(<MatrixPreview {...defaultProps} />);
     const artifact = defaultProps.artifactRef.current;
     expect(artifact).not.toBeNull();
@@ -21,6 +21,13 @@ describe('MatrixPreview', () => {
     expect(within(artifact).getByText(
       'Incident response support covers investigation, containment, and remediation within agreed service scope. '
       + 'Incident leadership, escalation, and decision authority are defined in the client\'s incident response plan.',
+    )).toBeVisible();
+    expect(within(artifact).getByText(
+      'Vendors always secure, monitor, and respond to incidents in their own platforms, '
+      + 'even where no vendor dot is shown.',
+    )).toBeVisible();
+    expect(within(artifact).getByText(
+      'A vendor dot in Backup & recovery can mean a native recovery feature, such as a recycle bin, not a full backup.',
     )).toBeVisible();
   });
 

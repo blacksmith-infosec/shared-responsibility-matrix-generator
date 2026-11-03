@@ -157,6 +157,14 @@ export const MatrixPreview = ({
             {' '}Incident leadership, escalation, and decision authority are defined in the client&apos;s
             incident response plan.
           </div>
+          <div className="legend-note">
+            Vendors always secure, monitor, and respond to incidents in their own platforms,
+            {' '}even where no vendor dot is shown.
+          </div>
+          <div className="legend-note">
+            A vendor dot in Backup &amp; recovery can mean a native recovery feature,
+            {' '}such as a recycle bin, not a full backup.
+          </div>
         </div>
       </div>
     </div>
