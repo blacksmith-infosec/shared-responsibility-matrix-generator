@@ -10,8 +10,8 @@ describe('CSV export', () => {
     system.assignments.data = ['c', 'v', 'm'];
     system.assignments.incident = ['m', 'c', 'v'];
     expect(createCsv([system])).toBe(
-      'System,Vendor,Data classification,Identity access,Endpoint protection,Network controls,' +
-      'App security & patching,Backup recovery,Logging & monitoring,Incident response support\r\n' +
+      'System,Vendor,Data protection,Identity & access,Endpoint security,Network security,' +
+      'App security & patching,Backup & recovery,Logging & monitoring,Incident response support\r\n' +
       '"Mail, ""Primary""","Line\nTwo",VMC,,,,,,,VMC',
     );
   });
@@ -84,8 +84,8 @@ describe('CSV downloads', () => {
     const blob = createObjectURL.mock.calls[0][0];
     expect(blob.type).toBe('text/csv;charset=utf-8;');
     expect(await readBlobText(blob)).toBe(
-      'System,Vendor,Data classification,Identity access,Endpoint protection,Network controls,' +
-      'App security & patching,Backup recovery,Logging & monitoring,Incident response support\r\n' +
+      'System,Vendor,Data protection,Identity & access,Endpoint security,Network security,' +
+      'App security & patching,Backup & recovery,Logging & monitoring,Incident response support\r\n' +
       'Client email,Microsoft,,VM,,,,,,MC',
     );
     expect(revokeObjectURL).toHaveBeenCalledExactlyOnceWith('blob:matrix-download');

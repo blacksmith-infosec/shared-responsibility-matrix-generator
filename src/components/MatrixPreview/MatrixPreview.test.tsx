@@ -47,12 +47,15 @@ describe('MatrixPreview', () => {
     const rows = within(table).getAllByRole('row');
     expect(rows).toHaveLength(3);
     const columns = within(rows[0]).getAllByRole('columnheader');
-    expect(columns).toHaveLength(9);
-    expect(columns[0]).toHaveAccessibleName('System');
-    expect(columns[1]).toHaveAccessibleName('Data classification');
-    expect(columns[7]).toHaveAccessibleName('Logging & monitoring');
-    expect(columns[8]).toHaveAccessibleName('Incident response support');
-    columns.forEach((column) => expect(column).toHaveAttribute('scope', 'col'));
+    const columnLabels = [
+      'System', 'Data protection', 'Identity & access', 'Endpoint security', 'Network security',
+      'App security & patching', 'Backup & recovery', 'Logging & monitoring', 'Incident response support',
+    ];
+    expect(columns).toHaveLength(columnLabels.length);
+    columns.forEach((column, index) => {
+      expect(column).toHaveAccessibleName(columnLabels[index]);
+      expect(column).toHaveAttribute('scope', 'col');
+    });
 
     const firstSystem = within(rows[1]);
     const rowHeader = firstSystem.getByRole('rowheader');

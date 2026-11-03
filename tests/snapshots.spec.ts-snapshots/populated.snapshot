@@ -28,30 +28,30 @@
   - textbox "Vendor":
     - /placeholder: e.g. Microsoft
     - text: Microsoft
-  - text: Category V M C Data classification
-  - 'button "Vendor: Data classification"'
-  - 'button "MSP: Data classification" [pressed]'
-  - 'button "Client: Data classification" [pressed]'
-  - text: Identity access
-  - 'button "Vendor: Identity access"'
-  - 'button "MSP: Identity access" [pressed]'
-  - 'button "Client: Identity access" [pressed]'
-  - text: Endpoint protection
-  - 'button "Vendor: Endpoint protection"'
-  - 'button "MSP: Endpoint protection" [pressed]'
-  - 'button "Client: Endpoint protection"'
-  - text: Network controls
-  - 'button "Vendor: Network controls"'
-  - 'button "MSP: Network controls"'
-  - 'button "Client: Network controls"'
+  - text: Category V M C Data protection
+  - 'button "Vendor: Data protection"'
+  - 'button "MSP: Data protection" [pressed]'
+  - 'button "Client: Data protection" [pressed]'
+  - text: Identity & access
+  - 'button "Vendor: Identity & access"'
+  - 'button "MSP: Identity & access" [pressed]'
+  - 'button "Client: Identity & access" [pressed]'
+  - text: Endpoint security
+  - 'button "Vendor: Endpoint security"'
+  - 'button "MSP: Endpoint security" [pressed]'
+  - 'button "Client: Endpoint security"'
+  - text: Network security
+  - 'button "Vendor: Network security"'
+  - 'button "MSP: Network security"'
+  - 'button "Client: Network security"'
   - text: App security & patching
   - 'button "Vendor: App security & patching" [pressed]'
   - 'button "MSP: App security & patching" [pressed]'
   - 'button "Client: App security & patching"'
-  - text: Backup recovery
-  - 'button "Vendor: Backup recovery" [pressed]'
-  - 'button "MSP: Backup recovery" [pressed]'
-  - 'button "Client: Backup recovery" [pressed]'
+  - text: Backup & recovery
+  - 'button "Vendor: Backup & recovery" [pressed]'
+  - 'button "MSP: Backup & recovery" [pressed]'
+  - 'button "Client: Backup & recovery" [pressed]'
   - text: Logging & monitoring
   - 'button "Vendor: Logging & monitoring"'
   - 'button "MSP: Logging & monitoring" [pressed]'
@@ -74,14 +74,14 @@
   - region "Responsibility matrix preview":
     - table "Shared responsibility matrix":
       - rowgroup:
-        - row "System Data classification Identity access Endpoint protection Network controls App security & patching Backup recovery Logging & monitoring Incident response support":
+        - row "System Data protection Identity & access Endpoint security Network security App security & patching Backup & recovery Logging & monitoring Incident response support":
           - columnheader "System"
-          - columnheader "Data classification"
-          - columnheader "Identity access"
-          - columnheader "Endpoint protection"
-          - columnheader "Network controls"
+          - columnheader "Data protection"
+          - columnheader "Identity & access"
+          - columnheader "Endpoint security"
+          - columnheader "Network security"
           - columnheader "App security & patching"
-          - columnheader "Backup recovery"
+          - columnheader "Backup & recovery"
           - columnheader "Logging & monitoring"
           - columnheader "Incident response support"
       - rowgroup:

@@ -94,8 +94,8 @@ describe('SystemList', () => {
     expect(handlers.onChange).toHaveBeenCalledWith('sys-1', 'name', 'Client mail');
     expect(handlers.onChange).toHaveBeenCalledWith('sys-1', 'vendor', 'Mail vendor');
 
-    const clientData = screen.getByRole('button', { name: 'Client: Data classification' });
-    const vendorData = screen.getByRole('button', { name: 'Vendor: Data classification' });
+    const clientData = screen.getByRole('button', { name: 'Client: Data protection' });
+    const vendorData = screen.getByRole('button', { name: 'Vendor: Data protection' });
     expect(clientData).toHaveAttribute('aria-pressed', 'true');
     expect(vendorData).toHaveAttribute('aria-pressed', 'true');
     await user.click(vendorData);
