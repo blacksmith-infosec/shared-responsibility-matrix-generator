@@ -324,7 +324,7 @@ test('downloads correctly quoted CSV and valid PNG and PDF files', async ({ page
   const csv = await csvPromise;
   expect(csv.suggestedFilename()).toBe('srm-example-partners.csv');
   expect((await readDownload(csv)).toString('utf8')).toBe(
-    'System,Vendor,Data classification,Identity access,Endpoint protection,Network controls,App security & patching,Backup recovery,Logging & monitoring,Incident response support\r\n'
+    'System,Vendor,Data protection,Identity & access,Endpoint security,Network security,App security & patching,Backup & recovery,Logging & monitoring,Incident response support\r\n'
     + '"CRM, ""Sales""","Example, Inc.",VMC,,,,,,,MC',
   );
 

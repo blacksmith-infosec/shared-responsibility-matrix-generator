@@ -123,12 +123,12 @@ When proposing a template change, include the vendor's authoritative documentati
 
 | Responsibility column | Definition |
 | --- | --- |
-| Data classification | Identify data sensitivity, ownership, permitted use, handling, and retention requirements. |
-| Identity access | Manage accounts, authentication policies, permissions, access approvals, and access reviews. |
-| Endpoint protection | Configure and operate protection for client devices and guest operating systems, including malware prevention and endpoint detection. |
-| Network controls | Configure and operate network security within the row's scope, including platform networks, client firewalls, segmentation, and DNS filtering. |
+| Data protection | Identify data sensitivity, ownership, permitted use, handling, and retention requirements. |
+| Identity & access | Manage accounts, authentication policies, permissions, access approvals, and access reviews. |
+| Endpoint security | Configure and operate protection for client devices and guest operating systems, including malware prevention and endpoint detection. |
+| Network security | Configure and operate network security within the row's scope, including platform networks, client firewalls, segmentation, and DNS filtering. |
 | App security & patching | Maintain the service or application, configure its security settings, and manage applicable software and firmware updates. |
-| Backup recovery | Define recovery requirements, configure and operate applicable recovery mechanisms, verify recoverability, and perform restores within the row's scope. |
+| Backup & recovery | Define recovery requirements, configure and operate applicable recovery mechanisms, verify recoverability, and perform restores within the row's scope. |
 | Logging & monitoring | Generate, configure, retain, and review security logs and alerts. |
 | Incident response support | Investigate, contain, and remediate incidents within agreed service scope. |
 
@@ -168,7 +168,7 @@ The responsibility defaults are modeled starting points for a managed-client eng
 
 Read each dot within the named row's scope. A filled dot indicates involvement, not that a control is configured, effective, or contractually guaranteed. Shared dots still need agreed ownership of specific tasks. An empty cell is unassigned and needs review; it does not establish that a control is unnecessary or not applicable.
 
-Vendor participation covers platform security and explicitly contracted managed security services. Tenant configuration, user access, data governance, and security settings remain with the client or MSP unless explicitly delegated. A vendor dot under Network controls can cover the provider's service network or a delivered filtering service; it does not by itself assign operation of the client's firewall or local network.
+Vendor participation covers platform security and explicitly contracted managed security services. Tenant configuration, user access, data governance, and security settings remain with the client or MSP unless explicitly delegated. A vendor dot under Network security can cover the provider's service network or a delivered filtering service; it does not by itself assign operation of the client's firewall or local network.
 
 Windows endpoints represents the device estate. Intune, endpoint security, DNS filtering, and backup products have separate rows for their own service scope; those rows do not imply complete device management. The backup rows cover recovery rather than endpoint threat protection, and EDR response or rollback does not provide general device backups. Huntress's template includes its managed SOC; SentinelOne Singularity Complete's template assumes MSP incident handling alongside vendor detection technology and automation. A separately purchased MDR service can change that allocation.
 
@@ -176,7 +176,7 @@ Logging & monitoring is separate from Incident response support. Generating logs
 
 Firewall templates assume the MSP operates the client's appliance and manages rules, firmware, configuration backups, and monitoring. SaaS data ownership, access approvals, retention choices, and recovery requirements remain client decisions. QuickBooks defaults keep accounting operations with the client; MSP participation assumes delegated access support. The 1Password recovery category covers vault and account recovery.
 
-Backup recovery applies to the row's data, workloads, configuration, or account access. A dot can assign responsibility for selecting and configuring a recovery approach even when no backup service is selected; it does not establish that a licensed, configured, and tested backup exists. Platform resilience, retention, and recovery features must be assessed separately against the client's recovery requirements.
+Backup & recovery applies to the row's data, workloads, configuration, or account access. A dot can assign responsibility for selecting and configuring a recovery approach even when no backup service is selected; it does not establish that a licensed, configured, and tested backup exists. Platform resilience, retention, and recovery features must be assessed separately against the client's recovery requirements.
 
 Datto SaaS Protection is scoped to Microsoft 365 and Google Workspace. Cove's template models server, workstation, and Microsoft 365 backup; its Google Workspace offering is currently in public preview. Confirm workload coverage and restore procedures before relying on either template. Collaboration retention and service availability also need a separate recovery plan.
 

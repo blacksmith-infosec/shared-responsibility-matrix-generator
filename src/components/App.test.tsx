@@ -18,7 +18,7 @@ describe('matrix application', () => {
     fireEvent.change(within(card).getByLabelText('System name'), { target: { value: 'Office' } });
     fireEvent.change(within(card).getByLabelText('Vendor'), { target: { value: 'Vendor' } });
     expect(document.querySelector('.m-rlabel')).toHaveTextContent('Office Vendor');
-    fireEvent.click(within(card).getByRole('button', { name: /Vendor.*Data classification/i }));
+    fireEvent.click(within(card).getByRole('button', { name: /Vendor.*Data protection/i }));
     expect(document.querySelector('.m-cell .dot.v')).toHaveClass('off');
     fireEvent.click(within(card).getByRole('button', { name: 'Expand/collapse' }));
     expect(card).not.toHaveClass('expanded');
