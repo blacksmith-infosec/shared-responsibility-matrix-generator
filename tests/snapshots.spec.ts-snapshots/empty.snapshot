@@ -1,0 +1,33 @@
+- complementary:
+  - heading "Who owns what for this client." [level=1]
+  - heading "Customer details" [level=2]
+  - text: Client name (optional)
+  - textbox "Client name (optional)":
+    - /placeholder: Client or organization name
+  - text: Prepared by (optional)
+  - textbox "Prepared by (optional)":
+    - /placeholder: Your firm or MSP name
+  - text: MSP logo optional · stored in your browser none
+  - button "Choose file…"
+  - heading "Systems in scope" [level=2]
+  - paragraph: Add the business systems you're mapping. Start with a template for sensible defaults, or pick Custom for a blank row.
+  - button "+ Add system ▼"
+  - text: No systems yet. Click "Add system" above to start defining the customer environment.
+- main:
+  - text: Preview
+  - button "PNG"
+  - button "PDF"
+  - button "CSV"
+  - paragraph: Your matrix is saved in this page's link. Anyone with the full link can read it, including client names. Share it only with people who should see it.
+  - paragraph: This is a planning aid. Confirm specific responsibility splits in your managed services agreement before treating them as binding.
+  - heading "Shared responsibility matrix" [level=1]
+  - text: /Customer name · Managed by MSP name · October \d+/
+  - button "Choose MSP logo": + MSP LOGO
+  - heading "Start with a template" [level=3]
+  - paragraph: Each system you add becomes a row in the matrix, showing who handles each security area. Pick one below or use Add system for the full catalog.
+  - paragraph: 1 · Add systems 2 · Set V/M/C 3 · Export PNG or PDF
+  - button /Microsoft \d+/
+  - button "Windows endpoints"
+  - button "Fortinet FortiGate"
+  - button "Datto SIRIS"
+  - text: Vendor / platform provider MSP Client Not involved Multiple filled dots indicate shared responsibility. Incident response support covers investigation, containment, and remediation within agreed service scope. Incident leadership, escalation, and decision authority are defined in the client's incident response plan. Vendors always secure, monitor, and respond to incidents in their own platforms, even where no vendor dot is shown. A vendor dot in Backup & recovery can mean a native recovery feature, such as a recycle bin, not a full backup.

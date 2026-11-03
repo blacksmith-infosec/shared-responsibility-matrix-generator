@@ -1,0 +1,108 @@
+- complementary:
+  - heading "Who owns what for this client." [level=1]
+  - heading "Customer details" [level=2]
+  - text: Client name (optional)
+  - textbox "Client name (optional)":
+    - /placeholder: Client or organization name
+    - text: Example Client
+  - text: Prepared by (optional)
+  - textbox "Prepared by (optional)":
+    - /placeholder: Your firm or MSP name
+    - text: Example MSP
+  - text: MSP logo optional · stored in your browser none
+  - button "Choose file…"
+  - heading "Systems in scope 2 systems" [level=2]
+  - paragraph: Add the business systems you're mapping. Start with a template for sensible defaults, or pick Custom for a blank row.
+  - button "+ Add system ▼"
+  - button "Expand/collapse": ▶
+  - text: /Microsoft \d+ Microsoft/
+  - button "Remove system": ×
+  - button "Expand/collapse" [expanded]: ▶
+  - text: Windows endpoints Microsoft
+  - button "Remove system": ×
+  - text: System name
+  - textbox "System name":
+    - /placeholder: e.g. Microsoft 365
+    - text: Windows endpoints
+  - text: Vendor
+  - textbox "Vendor":
+    - /placeholder: e.g. Microsoft
+    - text: Microsoft
+  - text: Category V M C Data classification
+  - 'button "Vendor: Data classification"'
+  - 'button "MSP: Data classification" [pressed]'
+  - 'button "Client: Data classification" [pressed]'
+  - text: Identity access
+  - 'button "Vendor: Identity access"'
+  - 'button "MSP: Identity access" [pressed]'
+  - 'button "Client: Identity access" [pressed]'
+  - text: Endpoint protection
+  - 'button "Vendor: Endpoint protection"'
+  - 'button "MSP: Endpoint protection" [pressed]'
+  - 'button "Client: Endpoint protection"'
+  - text: Network controls
+  - 'button "Vendor: Network controls"'
+  - 'button "MSP: Network controls"'
+  - 'button "Client: Network controls"'
+  - text: App security & patching
+  - 'button "Vendor: App security & patching" [pressed]'
+  - 'button "MSP: App security & patching" [pressed]'
+  - 'button "Client: App security & patching"'
+  - text: Backup recovery
+  - 'button "Vendor: Backup recovery" [pressed]'
+  - 'button "MSP: Backup recovery" [pressed]'
+  - 'button "Client: Backup recovery" [pressed]'
+  - text: Logging & monitoring
+  - 'button "Vendor: Logging & monitoring"'
+  - 'button "MSP: Logging & monitoring" [pressed]'
+  - 'button "Client: Logging & monitoring"'
+  - text: Incident response support
+  - 'button "Vendor: Incident response support"'
+  - 'button "MSP: Incident response support" [pressed]'
+  - 'button "Client: Incident response support" [pressed]'
+  - button "↺ Reset everything"
+- main:
+  - text: Preview
+  - button "PNG"
+  - button "PDF"
+  - button "CSV"
+  - paragraph: Your matrix is saved in this page's link. Anyone with the full link can read it, including client names. Share it only with people who should see it.
+  - paragraph: This is a planning aid. Confirm specific responsibility splits in your managed services agreement before treating them as binding.
+  - heading "Shared responsibility matrix" [level=1]
+  - text: /Example Client · Managed by Example MSP · October \d+/
+  - button "Choose MSP logo": + MSP LOGO
+  - region "Responsibility matrix preview":
+    - table "Shared responsibility matrix":
+      - rowgroup:
+        - row "System Data classification Identity access Endpoint protection Network controls App security & patching Backup recovery Logging & monitoring Incident response support":
+          - columnheader "System"
+          - columnheader "Data classification"
+          - columnheader "Identity access"
+          - columnheader "Endpoint protection"
+          - columnheader "Network controls"
+          - columnheader "App security & patching"
+          - columnheader "Backup recovery"
+          - columnheader "Logging & monitoring"
+          - columnheader "Incident response support"
+      - rowgroup:
+        - row /Microsoft \d+ Microsoft Vendor, MSP, Client MSP, Client Unassigned Vendor, MSP Vendor, MSP Vendor, MSP, Client Vendor, MSP MSP, Client/:
+          - rowheader /Microsoft \d+ Microsoft/
+          - cell "Vendor, MSP, Client"
+          - cell "MSP, Client"
+          - cell "Unassigned"
+          - cell "Vendor, MSP"
+          - cell "Vendor, MSP"
+          - cell "Vendor, MSP, Client"
+          - cell "Vendor, MSP"
+          - cell "MSP, Client"
+        - row "Windows endpoints Microsoft MSP, Client MSP, Client MSP Unassigned Vendor, MSP Vendor, MSP, Client MSP MSP, Client":
+          - rowheader "Windows endpoints Microsoft"
+          - cell "MSP, Client"
+          - cell "MSP, Client"
+          - cell "MSP"
+          - cell "Unassigned"
+          - cell "Vendor, MSP"
+          - cell "Vendor, MSP, Client"
+          - cell "MSP"
+          - cell "MSP, Client"
+  - text: Vendor / platform provider MSP Client Not involved Multiple filled dots indicate shared responsibility. Incident response support covers investigation, containment, and remediation within agreed service scope. Incident leadership, escalation, and decision authority are defined in the client's incident response plan. Vendors always secure, monitor, and respond to incidents in their own platforms, even where no vendor dot is shown. A vendor dot in Backup & recovery can mean a native recovery feature, such as a recycle bin, not a full backup.

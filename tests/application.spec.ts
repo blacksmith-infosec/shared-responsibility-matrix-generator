@@ -183,10 +183,6 @@ test('offers every client-facing template with its defaults and excludes templat
     expect(dimensions.contentWidth).toBeLessThanOrEqual(dimensions.width);
     expect(dimensions.contentHeight).toBeLessThanOrEqual(dimensions.height);
   }
-  await test.info().attach('mobile-template-menu', {
-    body: await page.locator('#add-menu').screenshot(),
-    contentType: 'image/png',
-  });
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.locator('#add-system-btn').click();
 

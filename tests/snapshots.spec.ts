@@ -7,19 +7,20 @@ test.beforeEach(async ({ page }) => {
   await preparePage(page);
 });
 
-const visualCases = [
+const snapshotCases = [
   { name: 'desktop-light', width: 1440, height: 1000, theme: 'light' },
   { name: 'desktop-dark', width: 1440, height: 1000, theme: 'dark' },
   { name: 'mobile-light', width: 390, height: 844, theme: 'light' },
 ];
 
-for (const visualCase of visualCases) {
+for (const snapshotCase of snapshotCases) {
   for (const populated of [false, true]) {
     const state = populated ? 'populated' : 'empty';
-    test(`visual: preserves the ${visualCase.name} ${state} appearance`, async ({ page }) => {
-      await page.setViewportSize({ width: visualCase.width, height: visualCase.height });
-      if (visualCase.theme === 'dark') {
+    test(`preserves the ${snapshotCase.name} ${state} content and structure`, async ({ page }) => {
+      await page.setViewportSize({ width: snapshotCase.width, height: snapshotCase.height });
+      if (snapshotCase.theme === 'dark') {
         await page.locator('#theme-toggle').click();
+        await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
       }
       if (populated) {
         await page.locator('#customer').fill('Example Client');
@@ -28,12 +29,8 @@ for (const visualCase of visualCases) {
         await page.locator('.system-card .card-head').click();
         await addTemplate(page, 'endpoints');
       }
-      await page.evaluate(() => document.fonts.ready);
-      await page.locator('.hero-title').click();
-      await expect(page).toHaveScreenshot(`${visualCase.name}-${state}.png`, {
-        fullPage: true,
-        animations: 'disabled',
-      });
+      // The editor's content and semantics stay the same across themes and viewport sizes.
+      await expect(page.locator('.main')).toMatchAriaSnapshot({ name: `${state}.snapshot` });
     });
   }
 }

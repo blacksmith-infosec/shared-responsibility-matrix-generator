@@ -17,6 +17,6 @@ Include steps to verify the change, relevant screenshots, and any effect on save
 - [ ] The change is focused and preserves unrelated behavior.
 - [ ] A regression test exercises the reported bug, where applicable.
 - [ ] Relevant lint, type, test, and build checks pass, or limitations are documented above.
-- [ ] UI changes have been reviewed against the visual references.
+- [ ] UI content snapshots and layout checks pass; styling changes have been reviewed manually.
 - [ ] Documentation reflects changed commands or behavior.
 - [ ] Examples and screenshots contain no real client data or credentials.

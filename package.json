@@ -18,8 +18,9 @@
     "lint": "eslint . --max-warnings 0",
     "test": "vitest run --coverage",
     "test:watch": "vitest",
-    "test:e2e": "playwright test --grep-invert visual",
-    "test:visual": "playwright test tests/visual.spec.ts",
+    "test:e2e": "playwright test",
+    "test:snapshots": "playwright test tests/snapshots.spec.ts",
+    "test:visual": "playwright test tests/snapshots.spec.ts",
     "coverage:prepare": "node scripts/prepare-coverage.js"
   },
   "dependencies": {

@@ -52,8 +52,9 @@ Open `http://localhost:8081`. `npm run dev` starts the same development server.
 | `npm run test:watch` | Run tests while editing |
 | `npm run build` | Check types and build the static site in `dist/` |
 | `npm run preview` | Serve the production build locally |
-| `npm run test:e2e` | Run browser behavior tests |
-| `npm run test:visual` | Compare browser screenshots with visual references |
+| `npm run test:e2e` | Run browser behavior and content snapshot tests |
+| `npm run test:snapshots` | Compare readable accessibility snapshots |
+| `npm run test:visual` | Alias for `test:snapshots` |
 | `npm run coverage:prepare` | Add the latest coverage report and badges to an existing production build |
 
 Install the browser before running browser tests:
@@ -61,7 +62,6 @@ Install the browser before running browser tests:
 ```bash
 npx playwright install chromium
 npm run test:e2e
-npm run test:visual
 ```
 
 To use an existing Google Chrome installation, prefix the browser commands with `PLAYWRIGHT_CHROME_CHANNEL=chrome`.
@@ -69,7 +69,7 @@ To use an existing Google Chrome installation, prefix the browser commands with 
 To run the behavior tests against the production build, run `npm run build`, then
 `PLAYWRIGHT_USE_PREVIEW=1 npm run test:e2e`. CI uses this mode to check the bundled application and exports.
 
-Visual references are specific to the operating system and browser. The initial references were captured on macOS; CI runs the functional browser tests on Linux. Review new screenshots before accepting them. See [CONTRIBUTING.md](CONTRIBUTING.md) for the testing workflow.
+Readable `.snapshot` files record accessible content and structure. Browser tests check layout and exports separately; review styling changes manually. CI includes the snapshot tests. See [CONTRIBUTING.md](CONTRIBUTING.md) for the testing workflow.
 
 ESLint 10 uses `@eslint/compat` for the React and accessibility plugins' older rule APIs. Their scoped peer-dependency
 overrides allow ESLint 10 without bypassing peer checks for other packages. Remove the overrides and compatibility
@@ -107,7 +107,7 @@ repository access while the repository is private.
 - `src/providers/` manages matrix state and theme preferences.
 - `src/modules/` contains named domain helpers for responsibility assignments, URL state, and exports.
 - `src/data/` contains the responsibility categories and system templates.
-- `tests/` contains browser behavior and visual tests.
+- `tests/` contains browser behavior tests and readable content snapshots.
 
 The application follows the React, TypeScript, Vite, Vitest, and ESLint conventions used in Blacksmith's other open source tools. The matrix styling and interaction model are preserved when changing the underlying implementation.
 

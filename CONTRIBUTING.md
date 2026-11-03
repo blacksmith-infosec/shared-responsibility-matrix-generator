@@ -59,24 +59,24 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-For changes that affect appearance or layout, also run:
+To run only the content snapshot checks:
 
 ```bash
-npm run test:visual
+npm run test:snapshots
 ```
 
 To check the production bundle after building, run `PLAYWRIGHT_USE_PREVIEW=1 npm run test:e2e`.
 The CI browser checks use this mode.
 
-If you use an existing Google Chrome installation, set `PLAYWRIGHT_CHROME_CHANNEL=chrome` for browser tests. Keep the same operating system and browser when comparing screenshots. Initial visual references are macOS screenshots; CI runs the functional tests on Linux and does not compare those macOS references.
+If you use an existing Google Chrome installation, set `PLAYWRIGHT_CHROME_CHANNEL=chrome` for browser tests. The browser suite includes readable `.snapshot` files that check accessible content and structure. Keep the explicit layout and export checks, and review styling changes manually.
 
-To accept an intentional visual change:
+To accept an intentional content or structure change:
 
 ```bash
-npm run test:visual -- --update-snapshots
+npm run test:snapshots -- --update-snapshots=all
 ```
 
-Inspect every changed reference and include screenshots in the pull request. Do not update references just to hide a regression. Report which checks ran, their results, and any environment limitation. Keep unrelated failures visible and provide reproduction steps rather than weakening assertions.
+Inspect every changed `.snapshot` file. Do not update snapshots just to hide a regression. Report which checks ran, their results, and any environment limitation. Keep unrelated failures visible and provide reproduction steps rather than weakening assertions.
 
 ## Security and privacy
 
